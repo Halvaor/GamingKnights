@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "297099105434",
+    "project_id": "gamingknights-c3208",
+    "storage_bucket": "gamingknights-c3208.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297099105434:android:a3440d10f1cf58580f7b23",
+        "android_client_info": {
+          "package_name": "com.halvaor.gamingknights"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1BJR8SbjuWbu1eyLLl1OHkwIcF1lOh1A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
