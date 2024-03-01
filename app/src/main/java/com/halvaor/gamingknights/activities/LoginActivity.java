@@ -1,4 +1,4 @@
-package com.halvaor.gamingknights;
+package com.halvaor.gamingknights.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -32,12 +32,16 @@ public class LoginActivity extends Activity {
         setContentView(binding.getRoot());
 
         binding.buttonLogin.setOnClickListener(view -> {
-            String email = Optional.ofNullable(binding.loginEmail.getText().toString()).orElse("");
-            String password = Optional.ofNullable(binding.loginPasswort.getText().toString()).orElse("");
-            login(email, password);
+            try {
+                String email = Optional.ofNullable(binding.loginInputEmail.getText().toString()).orElse("");
+                String password = Optional.ofNullable(binding.loginInputPassword.getText().toString()).orElse("");
+                login(email, password);
+            }catch (Exception exception) {
+                Log.e(TAG, "Login failed:", exception);
+            }
         });
 
-        binding.buttonRegister.setOnClickListener(view -> {
+        binding.loginButtonSignIn.setOnClickListener(view -> {
             Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
             startActivity(registerActivityIntent);
         });
@@ -56,26 +60,22 @@ public class LoginActivity extends Activity {
         //ToDo
     }
 
-    private void login(String email, String password) {
-        try{
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Login successful");
-                            FirebaseUser user = auth.getCurrentUser();
-                            //updateUI(user);
-                        } else {
-                            Log.w(TAG, "Login failed", task.getException());
-                            Toast.makeText(LoginActivity.this, "Login fehlgeschlagen", Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
-                        }
+    private void login(String email, String password) throws Exception {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Login successful");
+                        FirebaseUser user = auth.getCurrentUser();
+                        //ToDo updateUI(user);
+                    } else {
+                        Log.w(TAG, "Login failed", task.getException());
+                        Toast.makeText(LoginActivity.this, "Login fehlgeschlagen", Toast.LENGTH_SHORT).show();
+                        //ToDo updateUI(null);
                     }
-                });
-        } catch (Exception exception) {
-            Log.e(TAG, "Login failed:", exception);
-        }
+                }
+            });
         //ToDo weiterleitung bei erfolgreichem/ erfolglosem loginversuch fehlt noch
     }
 
