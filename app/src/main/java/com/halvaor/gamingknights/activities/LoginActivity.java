@@ -13,7 +13,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityLoginBinding;
+import com.halvaor.gamingknights.util.IdPrefix;
+import com.halvaor.gamingknights.util.UserID;
 
 import java.util.Optional;
 
@@ -21,7 +24,6 @@ public class LoginActivity extends Activity {
 
     private static final String TAG = "LoginActivity";
     private FirebaseAuth auth;
-
     private ActivityLoginBinding binding;
 
     @Override
@@ -47,36 +49,39 @@ public class LoginActivity extends Activity {
         });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if(currentUser != null) {
-            loadDashboardActivity();
-        }
-    }
+  //  @Override
+  //  public void onStart() {
+  //      super.onStart();
+  //      FirebaseUser currentUser = auth.getCurrentUser();
+  //      if(currentUser != null) {
+//
+  //          loadDashboardActivity(new UserID(currentUser.getUid()));
+  //      }
+  //  }
 
-    private void loadDashboardActivity() {
-        //ToDo
+    private void loadDashboardActivity(UserID userID) {
+        Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("userID", userID);
+        dashboardActivityIntent.putExtras(bundle);
+        startActivity(dashboardActivityIntent);
     }
 
     private void login(String email, String password) throws Exception {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "Login successful");
-                        FirebaseUser user = auth.getCurrentUser();
-                        //ToDo updateUI(user);
-                    } else {
-                        Log.w(TAG, "Login failed", task.getException());
-                        Toast.makeText(LoginActivity.this, "Login fehlgeschlagen", Toast.LENGTH_SHORT).show();
-                        //ToDo updateUI(null);
-                    }
+            .addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "Login successful");
+                    loadDashboardActivity(new UserID(auth.getCurrentUser().getUid()));
+                } else {
+                    Log.w(TAG, "Login failed", task.getException());
+                    Toast.makeText(LoginActivity.this, "Login fehlgeschlagen", Toast.LENGTH_SHORT).show();
+                    binding.loginInputEmail.setText("");
+                    binding.loginInputPassword.setText("");
+                    binding.loginDescriptionEmail.setTextColor(getResources().getColor(R.color.lightRed));
+                    binding.loginDescriptionPassword.setTextColor(getResources().getColor(R.color.lightRed));
                 }
             });
-        //ToDo weiterleitung bei erfolgreichem/ erfolglosem loginversuch fehlt noch
     }
 
 }

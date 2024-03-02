@@ -1,6 +1,7 @@
 package com.halvaor.gamingknights.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityRegisterBinding;
 import com.halvaor.gamingknights.util.IdPrefix;
+import com.halvaor.gamingknights.util.UserID;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,8 +81,8 @@ public class RegisterActivity extends Activity {
             .addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "User creation successful.");
-                    createUserEntry(auth.getCurrentUser(), inputs);
-                   //ToDo updateUI(user);
+                    UserID userID = createUserEntry(auth.getCurrentUser(), inputs);
+                    loadDashboardActivity(userID);
                 } else {
                     Log.w(TAG, "User creation failed.", task.getException());
                     Toast.makeText(RegisterActivity.this, task.getException().getMessage(),
@@ -93,10 +95,9 @@ public class RegisterActivity extends Activity {
             });
     }
 
-    private void createUserEntry(FirebaseUser user, Map<String, String> inputs) {
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private UserID createUserEntry(FirebaseUser user, Map<String, String> inputs) {
+        UserID userID = new UserID(user.getUid());
         Map<String, Object> userEntry = new HashMap<>();
-        String userID = IdPrefix.USER_ID + user.getUid();
 
         userEntry.put("FirstName", inputs.get("firstname"));
         userEntry.put("LastName", inputs.get("lastname"));
@@ -106,21 +107,36 @@ public class RegisterActivity extends Activity {
         userEntry.put("Town", inputs.get("town"));
         userEntry.put("Email", user.getEmail());
 
-        database.collection("User").document(userID)
+        insertUserEntry(user, userID, userEntry);
+
+        return userID;
+    }
+
+    private void insertUserEntry(FirebaseUser user, UserID userID, Map<String, Object> userEntry) {
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+
+        database.collection("User").document(userID.getId())
                 .set(userEntry)
                 .addOnSuccessListener(aVoid ->
-                        Log.d(TAG, "User: " + userID + " was successfully inserted in database."))
+                        Log.d(TAG, "User: " + userID.getId() + " was successfully inserted in database."))
                 .addOnFailureListener(exception -> {
-                        Log.e(TAG, "Error while trying to insert new user " + userID + "into databse.");
-                        Toast.makeText(this, "Failed to insert new User", Toast.LENGTH_SHORT);
-                        user.delete()
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "User account deleted.");
-                                    }
-                                });
+                    Log.e(TAG, "Error while trying to insert new user " + userID.getId() + "into databse.");
+                    Toast.makeText(this, "Failed to insert new User", Toast.LENGTH_SHORT);
+                    user.delete()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "User " + userID.getId() + " deleted.");
+                                }
+                            });
                 });
     }
 
+    private void loadDashboardActivity(UserID userID) {
+        Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("userID", userID);
+        dashboardActivityIntent.putExtras(bundle);
+        startActivity(dashboardActivityIntent);
+    }
 
 }
