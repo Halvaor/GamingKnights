@@ -1,19 +1,19 @@
 
 l
-java:S11926"JDefine a constant instead of duplicating this literal "firstname" 3 times.(ÌìÆÀùÿÿÿÿ8óÊÏõß1
+java:S1192."JDefine a constant instead of duplicating this literal "firstname" 3 times.(ÌìÆÀùÿÿÿÿ8óÊÏõß1
 m
-java:S1192:"KDefine a constant instead of duplicating this literal "postalCode" 3 times.(‘¥Ş€ıÿÿÿÿ8óÊÏõß1
+java:S11922"KDefine a constant instead of duplicating this literal "postalCode" 3 times.(‘¥Ş€ıÿÿÿÿ8óÊÏõß1
 n
-java:S11929"LDefine a constant instead of duplicating this literal "houseNumber" 3 times.(±—šıÿÿÿÿ8óÊÏõß1
+java:S11921"LDefine a constant instead of duplicating this literal "houseNumber" 3 times.(±—šıÿÿÿÿ8óÊÏõß1
 f
-java:S1192="IDefine a constant instead of duplicating this literal "password" 3 times.(’éğ¢8óÊÏõß1
+java:S11925"IDefine a constant instead of duplicating this literal "password" 3 times.(’éğ¢8óÊÏõß1
 d
-java:S11928"GDefine a constant instead of duplicating this literal "street" 3 times.(¼òƒ‰8óÊÏõß1
+java:S11920"GDefine a constant instead of duplicating this literal "street" 3 times.(¼òƒ‰8óÊÏõß1
 c
-java:S1192<"FDefine a constant instead of duplicating this literal "email" 3 times.(µ“€ß8óÊÏõß1
+java:S11924"FDefine a constant instead of duplicating this literal "email" 3 times.(µ“€ß8óÊÏõß1
 f
-java:S11927"IDefine a constant instead of duplicating this literal "lastname" 3 times.(É—öß8óÊÏõß1
+java:S1192/"IDefine a constant instead of duplicating this literal "lastname" 3 times.(É—öß8óÊÏõß1
 R
-java:S1874\"0Remove this use of "getColor"; it is deprecated.(ËÚ‹æşÿÿÿÿ8ŞËÏõß1
+java:S1874T"0Remove this use of "getColor"; it is deprecated.(ËÚ‹æşÿÿÿÿ8ŞËÏõß1
 R
-java:S1874]"0Remove this use of "getColor"; it is deprecated.(¡üà©ÿÿÿÿÿ8ŞËÏõß1
+java:S1874U"0Remove this use of "getColor"; it is deprecated.(¡üà©ÿÿÿÿÿ8ŞËÏõß1

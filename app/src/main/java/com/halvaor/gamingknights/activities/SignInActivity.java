@@ -6,39 +6,31 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.halvaor.gamingknights.R;
-import com.halvaor.gamingknights.databinding.ActivityRegisterBinding;
-import com.halvaor.gamingknights.util.IdPrefix;
-import com.halvaor.gamingknights.util.UserID;
+import com.halvaor.gamingknights.databinding.ActivitySigninBinding;
+import com.halvaor.gamingknights.IDs.UserID;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class RegisterActivity extends Activity {
+public class SignInActivity extends Activity {
 
-    private static final String TAG = "RegisterActivity";
+    private static final String TAG = "signInActivity";
     private FirebaseAuth auth;
-    private ActivityRegisterBinding binding;
+    private ActivitySigninBinding binding;
 
     @Override
     public void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
         auth = FirebaseAuth.getInstance();
-        binding = ActivityRegisterBinding.inflate(getLayoutInflater());
+        binding = ActivitySigninBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.registerButtonSignIn.setOnClickListener(view -> {
+        binding.signInButtonSignIn.setOnClickListener(view -> {
             try {
                 createAccount(validateInput(fetchInput()));
             }catch(Exception exception) {
@@ -51,14 +43,14 @@ public class RegisterActivity extends Activity {
     private Map<String, String> fetchInput() {
         Map<String, String> inputs = new HashMap<>();
 
-        inputs.put("firstname", Optional.ofNullable(binding.registerInputFirstname.getText().toString()).orElse(""));
-        inputs.put("lastname", Optional.ofNullable(binding.registerInputLastname.getText().toString()).orElse(""));
-        inputs.put("street", Optional.ofNullable(binding.registerInputStreet.getText().toString()).orElse(""));
-        inputs.put("houseNumber", Optional.ofNullable(binding.registerInputHouseNumber.getText().toString()).orElse(""));
-        inputs.put("postalCode", Optional.ofNullable(binding.registerInputPostalCode.getText().toString()).orElse(""));
-        inputs.put("town", Optional.ofNullable(binding.registerInputTown.getText().toString()).orElse(""));
-        inputs.put("email", Optional.ofNullable(binding.registerInputEmail.getText().toString()).orElse(""));
-        inputs.put("password", Optional.ofNullable(binding.registerInputPassword.getText().toString()).orElse(""));
+        inputs.put("firstname", Optional.ofNullable(binding.signInInputFirstname.getText().toString()).orElse(""));
+        inputs.put("lastname", Optional.ofNullable(binding.signInInputLastname.getText().toString()).orElse(""));
+        inputs.put("street", Optional.ofNullable(binding.signInInputStreet.getText().toString()).orElse(""));
+        inputs.put("houseNumber", Optional.ofNullable(binding.signInInputHouseNumber.getText().toString()).orElse(""));
+        inputs.put("postalCode", Optional.ofNullable(binding.signInInputPostalCode.getText().toString()).orElse(""));
+        inputs.put("town", Optional.ofNullable(binding.signInInputTown.getText().toString()).orElse(""));
+        inputs.put("email", Optional.ofNullable(binding.signInInputEmail.getText().toString()).orElse(""));
+        inputs.put("password", Optional.ofNullable(binding.signInInputPassword.getText().toString()).orElse(""));
 
         return inputs;
     }
@@ -85,12 +77,12 @@ public class RegisterActivity extends Activity {
                     loadDashboardActivity(userID);
                 } else {
                     Log.w(TAG, "User creation failed.", task.getException());
-                    Toast.makeText(RegisterActivity.this, task.getException().getMessage(),
+                    Toast.makeText(SignInActivity.this, task.getException().getMessage(),
                             Toast.LENGTH_SHORT).show();
-                    binding.registerInputEmail.setText("");
-                    binding.registerInputPassword.setText("");
-                    binding.registerDescriptionEmail.setTextColor(getResources().getColor(R.color.lightRed));
-                    binding.registerDescriptionPassword.setTextColor(getResources().getColor(R.color.lightRed));
+                    binding.signInInputEmail.setText("");
+                    binding.signInInputPassword.setText("");
+                    binding.signInDescriptionEmail.setTextColor(getResources().getColor(R.color.lightRed));
+                    binding.signInDescriptionPassword.setTextColor(getResources().getColor(R.color.lightRed));
                 }
             });
     }

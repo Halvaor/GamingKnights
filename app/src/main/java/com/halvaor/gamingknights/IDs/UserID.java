@@ -1,9 +1,4 @@
-package com.halvaor.gamingknights.util;
-
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import androidx.annotation.NonNull;
+package com.halvaor.gamingknights.IDs;
 
 import java.io.Serializable;
 

@@ -6,17 +6,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.halvaor.gamingknights.R;
+import com.halvaor.gamingknights.IDs.UserID;
 import com.halvaor.gamingknights.databinding.ActivityLoginBinding;
-import com.halvaor.gamingknights.util.IdPrefix;
-import com.halvaor.gamingknights.util.UserID;
 
 import java.util.Optional;
 
@@ -24,7 +18,9 @@ public class LoginActivity extends Activity {
 
     private static final String TAG = "LoginActivity";
     private FirebaseAuth auth;
+
     private ActivityLoginBinding binding;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,20 +40,18 @@ public class LoginActivity extends Activity {
         });
 
         binding.loginButtonSignIn.setOnClickListener(view -> {
-            Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
-            startActivity(registerActivityIntent);
+            Intent signInActivityIntent = new Intent(this, SignInActivity.class);
+            startActivity(signInActivityIntent);
         });
     }
 
-  //  @Override
-  //  public void onStart() {
-  //      super.onStart();
-  //      FirebaseUser currentUser = auth.getCurrentUser();
-  //      if(currentUser != null) {
-//
-  //          loadDashboardActivity(new UserID(currentUser.getUid()));
-  //      }
-  //  }
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(currentUser != null)
+            loadDashboardActivity(new UserID(currentUser.getUid()));
+    }
 
     private void loadDashboardActivity(UserID userID) {
         Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);

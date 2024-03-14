@@ -103,13 +103,16 @@
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
-                    android:text="xxxx"
+                    android:text=""
+                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
+                    android:textSize="16dp"/>
             </TableRow>
 
-            <TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/dashboard_card_dateTime_description"
@@ -134,10 +137,10 @@
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
-                    android:text="xx.xx.xx/ xx:xx Uhr"
+                    android:text=""
+                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
+                    android:textSize="16dp" />
             </TableRow>
 
             <TableRow>
@@ -165,10 +168,10 @@
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
-                    android:text="xxxx"
+                    android:text=""
+                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
+                    android:textSize="16dp"/>
 
 
             </TableRow>
@@ -198,10 +201,10 @@
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
-                    android:text="xxxx"
+                    android:text=""
+                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
+                    android:textSize="16dp" />
             </TableRow>
 
             <TableRow>
@@ -229,15 +232,61 @@
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
-                    android:text="Offen"
+                    android:text=""
                     android:textColor="@color/lightRed"
-                    android:textSize="18dp"
+                    android:textSize="16dp"
                     android:textStyle="bold" />
             </TableRow>
         </TableLayout>
     </androidx.cardview.widget.CardView>
 
-    <!--snappy recycler view-->
+    <TextView
+        android:id="@+id/dashboard_groupname_headline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@color/blue"
+        android:gravity="center"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:text="Deine Gruppen"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        android:textStyle="bold"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dashboard_card_view" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="169dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dashboard_groupname_headline">
+
+        <LinearLayout
+            android:id="@+id/dashboard_yourGroups_scrollView_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/dasboard_add_group_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/buttton"
+        android:text="Gruppe hinzufügen"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

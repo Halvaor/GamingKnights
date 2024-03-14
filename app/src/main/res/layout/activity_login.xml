@@ -10,27 +10,27 @@
         android:id="@+id/login_input_email"
         android:layout_width="310dp"
         android:layout_height="44dp"
-        android:layout_marginTop="232dp"
+        android:layout_marginBottom="76dp"
         android:background="@drawable/boarder"
         android:ems="10"
         android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@+id/login_input_password"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/login_input_password"
         android:layout_width="310dp"
         android:layout_height="44dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginBottom="92dp"
         android:background="@drawable/boarder"
         android:ems="10"
         android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/button_login"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_input_email" />
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/login_description_password"
@@ -39,40 +39,36 @@
         android:layout_marginBottom="8dp"
         android:text="Passwort"
         android:textColor="@color/grey"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/login_input_password"
         app:layout_constraintEnd_toEndOf="@+id/login_input_password"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/login_input_password"
-        app:layout_constraintTop_toBottomOf="@+id/login_input_email"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintStart_toStartOf="@+id/login_input_password" />
 
     <TextView
         android:id="@+id/login_description_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
+        android:layout_marginBottom="16dp"
         android:text="E-Mail"
         android:textColor="@color/grey"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/login_input_email"
         app:layout_constraintEnd_toEndOf="@+id/login_input_email"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/login_input_email"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintHorizontal_bias="0.003"
+        app:layout_constraintStart_toStartOf="@+id/login_input_email" />
 
     <Button
         android:id="@+id/button_login"
         android:layout_width="207dp"
         android:layout_height="60dp"
         android:layout_marginBottom="28dp"
-        android:backgroundTint="@color/lightGold"
+        android:background="@drawable/buttton"
         android:text="Login"
         android:textColor="@color/white"
-        android:textSize="20dp"
+        android:textSize="18dp"
         app:layout_constraintBottom_toTopOf="@+id/login_button_signIn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
@@ -83,10 +79,10 @@
         android:layout_width="207dp"
         android:layout_height="60dp"
         android:layout_marginBottom="72dp"
-        android:backgroundTint="@color/lightGold"
+        android:background="@drawable/buttton"
         android:text="Registrieren"
         android:textColor="@color/white"
-        android:textSize="20dp"
+        android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
