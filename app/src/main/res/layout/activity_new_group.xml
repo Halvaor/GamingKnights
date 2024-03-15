@@ -52,32 +52,32 @@
         app:layout_constraintTop_toBottomOf="@+id/newGroup_header" />
 
     <EditText
-        android:id="@+id/newGroup_value_userID"
+        android:id="@+id/newGroup_value_eMail"
         android:layout_width="310dp"
         android:layout_height="44dp"
         android:layout_marginTop="76dp"
         android:background="@drawable/boarder"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newGroup_value_groupname" />
 
     <TextView
-        android:id="@+id/newGroup_description_userID"
+        android:id="@+id/newGroup_description_eMail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:maxLength="15"
-        android:text="UserID"
+        android:text="E-Mail"
         android:textColor="@color/black"
         android:textSize="16dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/newGroup_value_userID"
-        app:layout_constraintEnd_toEndOf="@+id/newGroup_value_userID"
+        app:layout_constraintBottom_toTopOf="@+id/newGroup_value_eMail"
+        app:layout_constraintEnd_toEndOf="@+id/newGroup_value_eMail"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/newGroup_value_userID" />
+        app:layout_constraintStart_toStartOf="@+id/newGroup_value_eMail" />
 
     <Button
         android:id="@+id/newGroup_addUser_button"
@@ -88,10 +88,10 @@
         android:text="User hinzufügen"
         android:textColor="@color/white"
         android:textSize="16dp"
-        app:layout_constraintEnd_toEndOf="@+id/newGroup_value_userID"
+        app:layout_constraintEnd_toEndOf="@+id/newGroup_value_eMail"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/newGroup_value_userID"
-        app:layout_constraintTop_toBottomOf="@+id/newGroup_value_userID" />
+        app:layout_constraintStart_toStartOf="@+id/newGroup_value_eMail"
+        app:layout_constraintTop_toBottomOf="@+id/newGroup_value_eMail" />
 
     <Button
         android:id="@+id/newGroup_submit_button"
@@ -103,7 +103,7 @@
         android:textColor="@color/white"
         android:textSize="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/newGroup_value_userID"
+        app:layout_constraintEnd_toEndOf="@+id/newGroup_value_eMail"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/newGroup_addUser_button"
@@ -122,7 +122,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.004"
-        app:layout_constraintStart_toStartOf="@+id/newGroup_value_userID"
+        app:layout_constraintStart_toStartOf="@+id/newGroup_value_eMail"
         app:layout_constraintTop_toBottomOf="@+id/newGroup_addUser_button"
         app:layout_constraintVertical_bias="1.0" />
 

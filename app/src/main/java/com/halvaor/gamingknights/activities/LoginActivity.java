@@ -18,7 +18,6 @@ public class LoginActivity extends Activity {
 
     private static final String TAG = "LoginActivity";
     private FirebaseAuth auth;
-
     private ActivityLoginBinding binding;
 
 
@@ -55,9 +54,6 @@ public class LoginActivity extends Activity {
 
     private void loadDashboardActivity(UserID userID) {
         Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("userID", userID);
-        dashboardActivityIntent.putExtras(bundle);
         startActivity(dashboardActivityIntent);
     }
 

@@ -14,8 +14,6 @@ P
 :
 
 .gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
-|
-Lapp/src/main/java/com/halvaor/gamingknights/activities/RegisterActivity.java,8/a/8a41b8d4eb4ea3062167967b81212d0e0280add4
 y
 Iapp/src/main/java/com/halvaor/gamingknights/activities/LoginActivity.java,2/2/2283166f9b2e54fe993dfb61e3b87354df0b5fd2
 }
@@ -24,22 +22,6 @@ k
 ;app/src/main/java/com/halvaor/gamingknights/IDs/UserID.java,9/6/96d81a9e0de67b253f4d9553b7074c261ec51f79
 p
 @app/src/main/java/com/halvaor/gamingknights/IDs/PlaygroupID.java,f/7/f77e448574c0bdac7779120cc1088ab50248cd46
-…
-Uapp/src/main/java/com/halvaor/gamingknights/activities/dashboard/DasboardAdapter.java,6/c/6c39d6e6b83eb0408acf73bc86d1898865e23cc0
-„
-Tapp/src/main/java/com/halvaor/gamingknights/activities/newGroup/newGroupAdapter.java,b/b/bb4066e2240b7a91a16b7ed59232503d1675621c
-ˆ
-Xapp/src/main/java/com/halvaor/gamingknights/activities/dashboard/DasboardViewHolder.java,6/7/67b155b91d6ea4ae445261ac68d4a7bc25ff5f94
-‡
-Wapp/src/main/java/com/halvaor/gamingknights/activities/newGroup/NewGroupViewHolder.java,0/b/0b17a9029c80688f9bfb45a785f559dccef034b1
-…
-Uapp/src/main/java/com/halvaor/gamingknights/activities/newGroup/newGroupActivity.java,6/c/6cbdfef831558c9e5d0d50a3b7b9326c441ae64b
-…
-Uapp/src/main/java/com/halvaor/gamingknights/activities/newGroup/NewGroupActivity.java,c/8/c812dd74e74d4309bef6eed763043f359db4d297
-„
-Tapp/src/main/java/com/halvaor/gamingknights/activities/newGroup/NewGroupAdapter.java,4/8/48d996cad5e0f74f57a352368335c337155514f4
-v
-Fapp/src/main/java/com/halvaor/gamingknights/adapter/CustomAdapter.java,4/1/41e0c15e5687d74ed19b72294bcd5af80ff0f8d3
 |
 Lapp/src/main/java/com/halvaor/gamingknights/activities/NewGroupActivity.java,3/f/3f22fec00e366ac874bb40aad42cc67c90017beb
 z

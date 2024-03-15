@@ -37,7 +37,11 @@ public class DashboardActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userID = (UserID) getIntent().getExtras().getSerializable("userID");
+
+        Log.d(TAG, "Started onCreate");
+
+        auth = FirebaseAuth.getInstance();
+        userID = new UserID(auth.getUid());
         database = FirebaseFirestore.getInstance();
         ActivityDashboardBinding binding = ActivityDashboardBinding.inflate(getLayoutInflater());
 
@@ -105,19 +109,22 @@ public class DashboardActivity extends Activity {
                     Map<String, Object> hostData = (Map<String, Object>) result.getDocuments().get(0).get("Host");
                     binding.dashboardCardHostValue.setText(hostData.get("FirstName") + " " + hostData.get("LastName"));
 
-                    String hostAdress = hostData.get("Street") + " " + hostData.get("HouseNumber") + ", " + hostData.get("PostalCode") + " " + hostData.get("Town");
+                    String hostAdress = hostData.get("Street") + " " + hostData.get("HouseNumber") + ", \n" + hostData.get("PostalCode") + " " + hostData.get("Town");
                     binding.dashboardCardAdressValue.setText(hostAdress);
 
                     //determin if there are votes left open to be done
 
-                    Map<String, Object> foodTypeVotes = (Map<String, Object>) result.getDocuments().get(0).get("FoodTypeVotes");
-                    assert foodTypeVotes != null;
-                    Optional<Object> userVote_foodType = Optional.ofNullable(foodTypeVotes.get(userID.getId()));
+                    Optional<Object> userVote_foodType = Optional.empty();
+                    Map<String, Object> foodTypeVotes = (Map<String, Object>) (result.getDocuments().get(0).get("FoodTypeVotes"));
+                    if(foodTypeVotes != null) {
+                        userVote_foodType = Optional.ofNullable(foodTypeVotes.get(userID.getId()));
+                    }
 
+                    Optional<Object> userVote_gameSuggestion = Optional.empty();
                     Map<String, Object> gameSuggestionVotes = (Map<String, Object>) result.getDocuments().get(0).get("GameSuggestionVotes");
-                    assert gameSuggestionVotes != null;
-                    gameSuggestionVotes.get(userID.getId());
-                    Optional<Object> userVote_gameSuggestion = Optional.ofNullable(gameSuggestionVotes.get(userID.getId()));
+                    if(gameSuggestionVotes != null) {
+                        userVote_gameSuggestion = Optional.ofNullable(gameSuggestionVotes.get(userID.getId()));
+                    }
 
                     if(userVote_foodType.isPresent() && userVote_gameSuggestion.isPresent()) {
                         binding.dashboardCardTableReminderValue.setText("Erledigt");
@@ -126,7 +133,6 @@ public class DashboardActivity extends Activity {
                         binding.dashboardCardTableReminderValue.setText("Offen");
                         binding.dashboardCardTableReminderValue.setTextColor(getResources().getColor(R.color.lightRed, getTheme()));
                     }
-
                 }
             } else {
                 Log.d(TAG, "Failed to retrieve Data for next GameNight. ", task.getException());

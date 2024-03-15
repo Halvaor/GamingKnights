@@ -97,8 +97,8 @@
                 <TextView
                     android:id="@+id/dashboard_card_playgroup_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
                     android:paddingLeft="10dp"
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
@@ -131,8 +131,8 @@
                 <TextView
                     android:id="@+id/dashboard_card_dateTime_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
                     android:paddingLeft="10dp"
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
@@ -162,8 +162,8 @@
                 <TextView
                     android:id="@+id/dashboard_card_host_value"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
                     android:paddingLeft="10dp"
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
@@ -196,15 +196,15 @@
                     android:id="@+id/dashboard_card_adress_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
+                    android:gravity="end"
                     android:paddingLeft="10dp"
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
                     android:text=""
-                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="16dp" />
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
             </TableRow>
 
             <TableRow>
@@ -227,7 +227,7 @@
                     android:id="@+id/dashboard_card_table_reminder_value"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="right"
+                    android:gravity="end"
                     android:paddingLeft="10dp"
                     android:paddingTop="8dp"
                     android:paddingRight="10dp"
