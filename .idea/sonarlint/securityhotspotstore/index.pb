@@ -26,3 +26,5 @@ p
 Lapp/src/main/java/com/halvaor/gamingknights/activities/NewGroupActivity.java,3/f/3f22fec00e366ac874bb40aad42cc67c90017beb
 z
 Japp/src/main/java/com/halvaor/gamingknights/activities/SignInActivity.java,3/9/39f79d3f22b92f7367fa690911ed177ba6d434d1
+m
+=app/src/main/java/com/halvaor/gamingknights/IDs/IdPrefix.java,b/9/b92d76ae429f6c2a7405070ca566ceb07874dbaf

@@ -73,8 +73,8 @@ public class SignInActivity extends Activity {
             .addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "User creation successful.");
-                    UserID userID = createUserEntry(auth.getCurrentUser(), inputs);
-                    loadDashboardActivity(userID);
+                    createUserEntry(auth.getCurrentUser(), inputs);
+                    loadDashboardActivity();
                 } else {
                     Log.w(TAG, "User creation failed.", task.getException());
                     Toast.makeText(SignInActivity.this, task.getException().getMessage(),
@@ -87,7 +87,7 @@ public class SignInActivity extends Activity {
             });
     }
 
-    private UserID createUserEntry(FirebaseUser user, Map<String, String> inputs) {
+    private void createUserEntry(FirebaseUser user, Map<String, String> inputs) {
         UserID userID = new UserID(user.getUid());
         Map<String, Object> userEntry = new HashMap<>();
 
@@ -100,8 +100,6 @@ public class SignInActivity extends Activity {
         userEntry.put("Email", user.getEmail());
 
         insertUserEntry(user, userID, userEntry);
-
-        return userID;
     }
 
     private void insertUserEntry(FirebaseUser user, UserID userID, Map<String, Object> userEntry) {
@@ -123,11 +121,8 @@ public class SignInActivity extends Activity {
                 });
     }
 
-    private void loadDashboardActivity(UserID userID) {
+    private void loadDashboardActivity() {
         Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("userID", userID);
-        dashboardActivityIntent.putExtras(bundle);
         startActivity(dashboardActivityIntent);
     }
 

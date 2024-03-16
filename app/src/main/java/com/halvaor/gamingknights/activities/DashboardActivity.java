@@ -37,15 +37,12 @@ public class DashboardActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d(TAG, "Started onCreate");
-
         auth = FirebaseAuth.getInstance();
         userID = new UserID(auth.getUid());
         database = FirebaseFirestore.getInstance();
         ActivityDashboardBinding binding = ActivityDashboardBinding.inflate(getLayoutInflater());
-
         setContentView(binding.getRoot());
+
         retrieveAndSetToolbarData(binding);
         getNextGameNightAndFillDashboard(binding);
         initAndFillScrollView(binding);
@@ -58,8 +55,8 @@ public class DashboardActivity extends Activity {
     }
 
     private void initAndFillScrollView(ActivityDashboardBinding binding) {
-        CollectionReference userRef = database.collection("Playgroup");
-        Query query = userRef.where(Filter.arrayContains("Members", userID.getId()));
+        CollectionReference playgroupRef = database.collection("Playgroup");
+        Query query = playgroupRef.where(Filter.arrayContains("Members", userID.getId()));
 
         query.get().addOnCompleteListener(task -> {
 
