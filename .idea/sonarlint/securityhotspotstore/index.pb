@@ -5,12 +5,8 @@ D
 app/build.gradle.kts,d/2/d2a4383452aad84a18429a5844d31330a012a9e6
 H
 app/google-services.json,f/d/fd8d34b142d02ec743a8efefefd2c097961666e9
-n
->app/src/main/java/com/halvaor/gamingknights/LoginActivity.java,d/5/d5d7b217dedbc6be69ed837157ea840a283642f4
 P
  app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
-q
-Aapp/src/main/java/com/halvaor/gamingknights/RegisterActivity.java,b/1/b14f5aced0fb39351165def72aa0b845ac5e7ac5
 ;
 app/Notizen,3/4/34217e02b3182c200a0d89cc81802bed83f73bb8
 >
@@ -18,13 +14,19 @@ Aapp/src/main/java/com/halvaor/gamingknights/RegisterActivity.java,b/1/b14f5ace
 :
 
 .gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
-|
-Lapp/src/main/java/com/halvaor/gamingknights/activities/RegisterActivity.java,8/a/8a41b8d4eb4ea3062167967b81212d0e0280add4
 y
 Iapp/src/main/java/com/halvaor/gamingknights/activities/LoginActivity.java,2/2/2283166f9b2e54fe993dfb61e3b87354df0b5fd2
-i
-9app/src/main/java/com/halvaor/gamingknights/dto/User.java,d/e/decb74c9b897bff4f0f97a36ac25dea8b97b17fa
-t
-Dapp/src/main/java/com/halvaor/gamingknights/activities/IdPrefix.java,5/d/5d0904c81115084b72909394370b463ef8694e37
-n
->app/src/main/java/com/halvaor/gamingknights/util/IdPrefix.java,b/7/b709d94a465ed427d634362cf88edbdab2ec46b0
+}
+Mapp/src/main/java/com/halvaor/gamingknights/activities/DashboardActivity.java,2/c/2ccb0934f62c86b24eb20fddcc2187ef8cc085bc
+k
+;app/src/main/java/com/halvaor/gamingknights/IDs/UserID.java,9/6/96d81a9e0de67b253f4d9553b7074c261ec51f79
+p
+@app/src/main/java/com/halvaor/gamingknights/IDs/PlaygroupID.java,f/7/f77e448574c0bdac7779120cc1088ab50248cd46
+|
+Lapp/src/main/java/com/halvaor/gamingknights/activities/NewGroupActivity.java,3/f/3f22fec00e366ac874bb40aad42cc67c90017beb
+z
+Japp/src/main/java/com/halvaor/gamingknights/activities/SignInActivity.java,3/9/39f79d3f22b92f7367fa690911ed177ba6d434d1
+m
+=app/src/main/java/com/halvaor/gamingknights/IDs/IdPrefix.java,b/9/b92d76ae429f6c2a7405070ca566ceb07874dbaf
+{
+Kapp/src/main/java/com/halvaor/gamingknights/activities/ProfileActivity.java,9/4/945793fbdc31eeb80f55e499910469e798176a73

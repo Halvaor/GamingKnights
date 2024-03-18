@@ -6,13 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.halvaor.gamingknights.R;
+import com.halvaor.gamingknights.IDs.UserID;
 import com.halvaor.gamingknights.databinding.ActivityLoginBinding;
 
 import java.util.Optional;
@@ -21,8 +18,8 @@ public class LoginActivity extends Activity {
 
     private static final String TAG = "LoginActivity";
     private FirebaseAuth auth;
-
     private ActivityLoginBinding binding;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +32,14 @@ public class LoginActivity extends Activity {
             try {
                 String email = Optional.ofNullable(binding.loginInputEmail.getText().toString()).orElse("");
                 String password = Optional.ofNullable(binding.loginInputPassword.getText().toString()).orElse("");
+                if(email.isEmpty()) {
+                    Log.d(TAG, "Email can not be empty");
+                    Toast.makeText(this, "Bitte geben sie eine E-Mail an.", Toast.LENGTH_SHORT).show();
+                }
+                if(password.isEmpty()) {
+                    Log.d(TAG, "Password can not be empty");
+                    Toast.makeText(this, "Bitte geben sie ein Passwort an.", Toast.LENGTH_SHORT).show();
+                }
                 login(email, password);
             }catch (Exception exception) {
                 Log.e(TAG, "Login failed:", exception);
@@ -42,8 +47,8 @@ public class LoginActivity extends Activity {
         });
 
         binding.loginButtonSignIn.setOnClickListener(view -> {
-            Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
-            startActivity(registerActivityIntent);
+            Intent signInActivityIntent = new Intent(this, SignInActivity.class);
+            startActivity(signInActivityIntent);
         });
     }
 
@@ -51,32 +56,30 @@ public class LoginActivity extends Activity {
     public void onStart() {
         super.onStart();
         FirebaseUser currentUser = auth.getCurrentUser();
-        if(currentUser != null) {
-            loadDashboardActivity();
-        }
+        if(currentUser != null)
+            loadDashboardActivity(new UserID(currentUser.getUid()));
     }
 
-    private void loadDashboardActivity() {
-        //ToDo
+    private void loadDashboardActivity(UserID userID) {
+        Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
+        startActivity(dashboardActivityIntent);
     }
 
     private void login(String email, String password) throws Exception {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "Login successful");
-                        FirebaseUser user = auth.getCurrentUser();
-                        //ToDo updateUI(user);
-                    } else {
-                        Log.w(TAG, "Login failed", task.getException());
-                        Toast.makeText(LoginActivity.this, "Login fehlgeschlagen", Toast.LENGTH_SHORT).show();
-                        //ToDo updateUI(null);
-                    }
+            .addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "Login successful");
+                    loadDashboardActivity(new UserID(auth.getCurrentUser().getUid()));
+                } else {
+                    Log.w(TAG, "Login failed", task.getException());
+                    Toast.makeText(LoginActivity.this, "Login fehlgeschlagen", Toast.LENGTH_SHORT).show();
+                    binding.loginInputEmail.setText("");
+                    binding.loginInputPassword.setText("");
+                    binding.loginDescriptionEmail.setTextColor(getResources().getColor(R.color.lightRed));
+                    binding.loginDescriptionPassword.setTextColor(getResources().getColor(R.color.lightRed));
                 }
             });
-        //ToDo weiterleitung bei erfolgreichem/ erfolglosem loginversuch fehlt noch
     }
 
 }

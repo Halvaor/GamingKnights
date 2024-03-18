@@ -18,12 +18,23 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.RegisterActivity"
+            android:name=".activities.SignInActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".activities.DashboardActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".activities.NewGroupActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".activities.ProfileActivity"
             android:exported="true">
         </activity>
 

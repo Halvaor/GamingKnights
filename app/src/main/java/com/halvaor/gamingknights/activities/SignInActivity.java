@@ -1,42 +1,36 @@
 package com.halvaor.gamingknights.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.halvaor.gamingknights.R;
-import com.halvaor.gamingknights.databinding.ActivityRegisterBinding;
-import com.halvaor.gamingknights.util.IdPrefix;
+import com.halvaor.gamingknights.databinding.ActivitySigninBinding;
+import com.halvaor.gamingknights.IDs.UserID;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class RegisterActivity extends Activity {
+public class SignInActivity extends Activity {
 
-    private static final String TAG = "RegisterActivity";
+    private static final String TAG = "signInActivity";
     private FirebaseAuth auth;
-    private ActivityRegisterBinding binding;
+    private ActivitySigninBinding binding;
 
     @Override
     public void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
         auth = FirebaseAuth.getInstance();
-        binding = ActivityRegisterBinding.inflate(getLayoutInflater());
+        binding = ActivitySigninBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.registerButtonSignIn.setOnClickListener(view -> {
+        binding.signInButtonSignIn.setOnClickListener(view -> {
             try {
                 createAccount(validateInput(fetchInput()));
             }catch(Exception exception) {
@@ -49,14 +43,14 @@ public class RegisterActivity extends Activity {
     private Map<String, String> fetchInput() {
         Map<String, String> inputs = new HashMap<>();
 
-        inputs.put("firstname", Optional.ofNullable(binding.registerInputFirstname.getText().toString()).orElse(""));
-        inputs.put("lastname", Optional.ofNullable(binding.registerInputLastname.getText().toString()).orElse(""));
-        inputs.put("street", Optional.ofNullable(binding.registerInputStreet.getText().toString()).orElse(""));
-        inputs.put("houseNumber", Optional.ofNullable(binding.registerInputHouseNumber.getText().toString()).orElse(""));
-        inputs.put("postalCode", Optional.ofNullable(binding.registerInputPostalCode.getText().toString()).orElse(""));
-        inputs.put("town", Optional.ofNullable(binding.registerInputTown.getText().toString()).orElse(""));
-        inputs.put("email", Optional.ofNullable(binding.registerInputEmail.getText().toString()).orElse(""));
-        inputs.put("password", Optional.ofNullable(binding.registerInputPassword.getText().toString()).orElse(""));
+        inputs.put("firstname", Optional.ofNullable(binding.signInInputFirstname.getText().toString()).orElse(""));
+        inputs.put("lastname", Optional.ofNullable(binding.signInInputLastname.getText().toString()).orElse(""));
+        inputs.put("street", Optional.ofNullable(binding.signInInputStreet.getText().toString()).orElse(""));
+        inputs.put("houseNumber", Optional.ofNullable(binding.signInInputHouseNumber.getText().toString()).orElse(""));
+        inputs.put("postalCode", Optional.ofNullable(binding.signInInputPostalCode.getText().toString()).orElse(""));
+        inputs.put("town", Optional.ofNullable(binding.signInInputTown.getText().toString()).orElse(""));
+        inputs.put("email", Optional.ofNullable(binding.signInInputEmail.getText().toString()).orElse(""));
+        inputs.put("password", Optional.ofNullable(binding.signInInputPassword.getText().toString()).orElse(""));
 
         return inputs;
     }
@@ -80,23 +74,22 @@ public class RegisterActivity extends Activity {
                 if (task.isSuccessful()) {
                     Log.d(TAG, "User creation successful.");
                     createUserEntry(auth.getCurrentUser(), inputs);
-                   //ToDo updateUI(user);
+                    loadDashboardActivity();
                 } else {
                     Log.w(TAG, "User creation failed.", task.getException());
-                    Toast.makeText(RegisterActivity.this, task.getException().getMessage(),
+                    Toast.makeText(SignInActivity.this, task.getException().getMessage(),
                             Toast.LENGTH_SHORT).show();
-                    binding.registerInputEmail.setText("");
-                    binding.registerInputPassword.setText("");
-                    binding.registerDescriptionEmail.setTextColor(getResources().getColor(R.color.lightRed));
-                    binding.registerDescriptionPassword.setTextColor(getResources().getColor(R.color.lightRed));
+                    binding.signInInputEmail.setText("");
+                    binding.signInInputPassword.setText("");
+                    binding.signInDescriptionEmail.setTextColor(getResources().getColor(R.color.lightRed));
+                    binding.signInDescriptionPassword.setTextColor(getResources().getColor(R.color.lightRed));
                 }
             });
     }
 
     private void createUserEntry(FirebaseUser user, Map<String, String> inputs) {
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        UserID userID = new UserID(user.getUid());
         Map<String, Object> userEntry = new HashMap<>();
-        String userID = IdPrefix.USER_ID + user.getUid();
 
         userEntry.put("FirstName", inputs.get("firstname"));
         userEntry.put("LastName", inputs.get("lastname"));
@@ -106,21 +99,31 @@ public class RegisterActivity extends Activity {
         userEntry.put("Town", inputs.get("town"));
         userEntry.put("Email", user.getEmail());
 
-        database.collection("User").document(userID)
+        insertUserEntry(user, userID, userEntry);
+    }
+
+    private void insertUserEntry(FirebaseUser user, UserID userID, Map<String, Object> userEntry) {
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+
+        database.collection("User").document(userID.getId())
                 .set(userEntry)
                 .addOnSuccessListener(aVoid ->
-                        Log.d(TAG, "User: " + userID + " was successfully inserted in database."))
+                        Log.d(TAG, "User: " + userID.getId() + " was successfully inserted in database."))
                 .addOnFailureListener(exception -> {
-                        Log.e(TAG, "Error while trying to insert new user " + userID + "into databse.");
-                        Toast.makeText(this, "Failed to insert new User", Toast.LENGTH_SHORT);
-                        user.delete()
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "User account deleted.");
-                                    }
-                                });
+                    Log.e(TAG, "Error while trying to insert new user " + userID.getId() + "into databse.");
+                    Toast.makeText(this, "Failed to insert new User", Toast.LENGTH_SHORT);
+                    user.delete()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "User " + userID.getId() + " deleted.");
+                                }
+                            });
                 });
     }
 
+    private void loadDashboardActivity() {
+        Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
+        startActivity(dashboardActivityIntent);
+    }
 
 }
