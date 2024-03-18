@@ -104,9 +104,9 @@
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
                     android:text=""
-                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="16dp"/>
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
             </TableRow>
 
             <TableRow
@@ -138,9 +138,9 @@
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
                     android:text=""
-                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="16dp" />
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
             </TableRow>
 
             <TableRow>
@@ -169,9 +169,9 @@
                     android:paddingRight="10dp"
                     android:paddingBottom="8dp"
                     android:text=""
-                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="16dp"/>
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
 
 
             </TableRow>
@@ -244,25 +244,27 @@
         android:id="@+id/dashboard_groupname_headline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="5dp"
         android:background="@color/blue"
         android:gravity="center"
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
         android:text="Deine Gruppen"
         android:textColor="@color/white"
-        android:textSize="20dp"
-        android:textStyle="bold"
 
+        android:textSize="16dp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dashboard_card_view" />
 
     <ScrollView
+        android:id="@+id/scrollView3"
         android:layout_width="match_parent"
-        android:layout_height="169dp"
+        android:layout_height="180dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

@@ -19,7 +19,6 @@ import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityNewGroupBinding;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,7 @@ public class NewGroupActivity extends Activity {
             startActivity(dashboardActitvityIntent);
         });
         binding.newGroupAddUserButton.setOnClickListener(view -> addUser(binding));
-        binding.newGroupSubmitButton.setOnClickListener(view -> addGroup(binding));
+        binding.newGroupSubmitButton.setOnClickListener(view -> createGroup(binding));
     }
 
     private void fillUserView(ActivityNewGroupBinding binding) {
@@ -111,7 +110,7 @@ public class NewGroupActivity extends Activity {
         }
 
 
-    private void addGroup(ActivityNewGroupBinding binding) {
+    private void createGroup(ActivityNewGroupBinding binding) {
         CollectionReference playgroupRef = database.collection("Playgroup");
         PlaygroupID playgroupID = new PlaygroupID(playgroupRef.document().getId());
 
@@ -128,13 +127,11 @@ public class NewGroupActivity extends Activity {
             groupData.put("Name", groupName);
             groupData.put("Members", groupMemberUserID);
 
-            playgroupRef.document(playgroupID.getPlaygroupID()).set(groupData);
+            playgroupRef.document(playgroupID.getId()).set(groupData);
 
             Intent dashboardIntent = new Intent(this, DashboardActivity.class);
             startActivity(dashboardIntent);
         }
     }
-
-
 
 }

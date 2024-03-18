@@ -10,7 +10,7 @@ public class PlaygroupID implements Serializable {
         this.playgroupID = IdPrefix.PLAYGROUP_ID + playgroupID;
     }
 
-    public String getPlaygroupID() {
+    public String getId() {
         return playgroupID;
     }
 }

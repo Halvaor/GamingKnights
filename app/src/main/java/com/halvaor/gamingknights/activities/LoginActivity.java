@@ -32,6 +32,14 @@ public class LoginActivity extends Activity {
             try {
                 String email = Optional.ofNullable(binding.loginInputEmail.getText().toString()).orElse("");
                 String password = Optional.ofNullable(binding.loginInputPassword.getText().toString()).orElse("");
+                if(email.isEmpty()) {
+                    Log.d(TAG, "Email can not be empty");
+                    Toast.makeText(this, "Bitte geben sie eine E-Mail an.", Toast.LENGTH_SHORT).show();
+                }
+                if(password.isEmpty()) {
+                    Log.d(TAG, "Password can not be empty");
+                    Toast.makeText(this, "Bitte geben sie ein Passwort an.", Toast.LENGTH_SHORT).show();
+                }
                 login(email, password);
             }catch (Exception exception) {
                 Log.e(TAG, "Login failed:", exception);

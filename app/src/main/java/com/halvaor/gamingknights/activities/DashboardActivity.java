@@ -52,6 +52,11 @@ public class DashboardActivity extends Activity {
                 startActivity(newGroupActivityIntent);
         });
 
+        binding.dashboardToolbarEditbutton.setOnClickListener(view -> {
+            Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
+            startActivity(profileActivityIntent);
+        });
+
     }
 
     private void initAndFillScrollView(ActivityDashboardBinding binding) {

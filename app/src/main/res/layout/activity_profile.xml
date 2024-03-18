@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tintedBlue">
+
+    <TextView
+        android:id="@+id/profile_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue"
+        android:gravity="center"
+        android:paddingTop="15sp"
+        android:paddingBottom="15sp"
+        android:text="Profil"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16sp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_header">
+
+        <TextView
+            android:id="@+id/profile_firstname_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+           
+            android:layout_marginStart="10sp"
+            android:maxLength="15"
+            android:text="Vorname"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/profile_firstname_value"
+            android:layout_width="310sp"
+            android:layout_height="44sp"
+            android:layout_marginStart="10sp"
+            android:layout_marginBottom="20sp"
+            android:background="@drawable/boarder"
+            android:inputType="text"
+            />
+
+        <TextView
+            android:id="@+id/profile_lastname_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10sp"
+            android:maxLength="15"
+            android:text="Nachname"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/profile_lastname_value"
+            android:layout_width="310sp"
+            android:layout_height="44sp"
+            android:layout_marginStart="10sp"
+            android:layout_marginBottom="20sp"
+            android:background="@drawable/boarder"
+            android:inputType="text" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            
+            <TextView
+                android:id="@+id/profile_street_description"
+                android:layout_width="250sp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:layout_marginStart="10sp"
+                android:maxLength="15"
+                android:text="Straße"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/profile_houseNumber_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:layout_marginStart="10sp"
+                android:maxLength="15"
+                android:text="Hausnummer"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+    
+            <EditText
+                android:id="@+id/profile_street_value"
+                android:layout_width="250sp"
+                android:layout_height="44sp"
+                android:background="@drawable/boarder"
+                android:inputType="text"
+                android:layout_marginBottom="20sp"
+                android:layout_marginStart="10sp"
+                />
+
+            <EditText
+                android:id="@+id/profile_houseNumber_value"
+                android:layout_width="100sp"
+                android:layout_height="44sp"
+                android:background="@drawable/boarder"
+                android:inputType="text"
+                android:layout_marginBottom="20sp"
+                android:layout_marginStart="10sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/profile_town_description"
+                android:layout_width="250sp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:layout_marginStart="10sp"
+                android:maxLength="15"
+                android:text="Ort"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/profile_postalcode_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8sp"
+                android:layout_marginStart="10sp"
+                android:maxLength="15"
+                android:text="Postleitzahl"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/profile_town_value"
+                android:layout_width="250sp"
+                android:layout_height="44sp"
+                android:background="@drawable/boarder"
+                android:inputType="text"
+                android:layout_marginBottom="20sp"
+                android:layout_marginStart="10sp"
+                />
+
+            <EditText
+                android:id="@+id/profile_postalcode_value"
+                android:layout_width="100sp"
+                android:layout_height="44sp"
+                android:background="@drawable/boarder"
+                android:inputType="text"
+                android:layout_marginBottom="20sp"
+                android:layout_marginStart="10sp"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/profile_eMail_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="10sp"
+            android:maxLength="15"
+            android:text="E-Mail"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/profile_eMail_value"
+            android:layout_width="310sp"
+            android:layout_height="44sp"
+            android:layout_marginStart="10sp"
+            android:layout_marginBottom="20sp"
+            android:background="@drawable/boarder"
+            android:backgroundTint="@color/lightBlue"
+            android:inputType="text"
+            />
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/profile_cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginStart="60dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/buttton"
+        android:text="Abbrechen"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/profile_footer"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/profile_save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginEnd="60dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/buttton"
+        android:text="Änderungen \n Speichern"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/profile_footer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/profile_cancel_button" />
+
+    <Button
+        android:id="@+id/profile_logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:background="@drawable/buttton"
+        android:text="Ausloggen"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:translationZ="200sp"
+        app:layout_constraintBottom_toBottomOf="@+id/profile_footer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/profile_footer"
+        app:layout_constraintTop_toTopOf="@+id/profile_footer" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/profile_footer"
+        android:layout_width="match_parent"
+        android:layout_height="91sp"
+        android:background="?attr/colorPrimary"
+        android:backgroundTint="@color/blue"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
