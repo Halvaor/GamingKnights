@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public class PlaygroupID implements Serializable {
 
-    private String playgroupID;
+    private final String id;
 
     public PlaygroupID(String playgroupID) {
-        this.playgroupID = IdPrefix.PLAYGROUP_ID + playgroupID;
+        this.id = IdPrefix.PLAYGROUP_ID + playgroupID;
     }
 
     public String getId() {
-        return playgroupID;
+        return id;
     }
 }

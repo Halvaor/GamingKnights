@@ -23,22 +23,34 @@
         </activity>
         <activity
             android:name=".activities.SignInActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
             android:name=".activities.DashboardActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
             android:name=".activities.NewGroupActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
             android:name=".activities.ProfileActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan">
         </activity>
-
-
+        <activity
+            android:name=".activities.GroupActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan">
+        </activity>
+        <activity
+            android:name=".activities.EditGroupActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan">
+        </activity>
     </application>
 
 </manifest>
