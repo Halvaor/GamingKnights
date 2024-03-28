@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public class NewGroupActivity extends Activity {
@@ -43,7 +46,7 @@ public class NewGroupActivity extends Activity {
 
         //add current user
         groupMemberUserID.add(new UserID(auth.getUid()).getId());
-        groupMemberEMail.add("Aktueller Nutzer");
+        groupMemberEMail.add(Objects.requireNonNull(auth.getCurrentUser()).getEmail());
         fillUserView(binding);
 
         //setListeners
@@ -114,7 +117,7 @@ public class NewGroupActivity extends Activity {
         CollectionReference playgroupRef = database.collection("Playgroup");
         PlaygroupID playgroupID = new PlaygroupID(playgroupRef.document().getId());
 
-        //Get and validate Groupname
+        //Get and validate GroupName
         String groupName = Optional.ofNullable(binding.newGroupValueGroupname.getText().toString()).orElse("");
         if(groupName.isEmpty()) {
             Log.w(TAG, "GroupName is empty");
@@ -122,16 +125,29 @@ public class NewGroupActivity extends Activity {
             Toast.makeText(NewGroupActivity.this, "Bitte gib einen Gruppennamen an.",
                     Toast.LENGTH_SHORT).show();
         } else {
+            insertPlaygroupAndAddMemberships(playgroupRef, playgroupID, groupName);
 
+            Intent dashboardIntent = new Intent(this, DashboardActivity.class);
+            startActivity(dashboardIntent);
+        }
+    }
+
+    private void insertPlaygroupAndAddMemberships(CollectionReference playgroupRef, PlaygroupID playgroupID, String groupName) {
+        Runnable runnable = () -> {
             Map<String, Object> groupData = new HashMap<>();
             groupData.put("Name", groupName);
             groupData.put("Members", groupMemberUserID);
 
             playgroupRef.document(playgroupID.getId()).set(groupData);
 
-            Intent dashboardIntent = new Intent(this, DashboardActivity.class);
-            startActivity(dashboardIntent);
-        }
+            for(String userID : groupMemberUserID) {
+                DocumentReference userDocument = database.collection("User").document(userID);
+                userDocument.update("Membership", FieldValue.arrayUnion(playgroupID.getId()));
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
     }
 
 }

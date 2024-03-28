@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/tintedBlue">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:paddingTop="3dp"
+        android:background="@color/grey"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/view_item_with_rating"
+            android:layout_width="162sp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="start"
+            android:paddingLeft="10dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:text="itemName"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:stretchColumns="1">
+            <TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="4sp"
+                    android:paddingLeft="10sp"
+                    android:paddingRight="10dp"
+                    android:text="Gastgeber"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="4sp"
+                    android:paddingLeft="10sp"
+                    android:paddingRight="10dp"
+                    android:text="Essen"
+                    android:background="@color/tintedBlue"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="4sp"
+                    android:paddingLeft="10sp"
+                    android:paddingRight="10dp"
+                    android:text="Gesamt"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:id="@+id/host_rating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="6sp"
+                    android:paddingLeft="10sp"
+                    android:paddingRight="10dp"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/food_rating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="6sp"
+                    android:paddingLeft="10sp"
+                    android:paddingRight="10dp"
+                    android:text=""
+                    android:background="@color/tintedBlue"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/general_rating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="6sp"
+                    android:paddingLeft="10sp"
+                    android:paddingRight="10dp"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:paddingTop="3dp"
+        android:background="@color/grey"/>
+
+</LinearLayout>
+

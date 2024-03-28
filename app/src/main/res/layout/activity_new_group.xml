@@ -49,6 +49,7 @@
         android:background="@drawable/boarder"
         android:ems="10"
         android:inputType="text"
+        android:maxLength="20"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
@@ -98,24 +99,6 @@
         app:layout_constraintStart_toStartOf="@+id/newGroup_value_eMail"
         app:layout_constraintTop_toBottomOf="@+id/newGroup_value_eMail" />
 
-    <TextView
-        android:id="@+id/newGroup_groupMember_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/blue"
-        android:gravity="center"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:text="Gruppenmitglieder"
-
-        android:textColor="@color/white"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <Button
         android:id="@+id/newGroup_submit_button"
         android:layout_width="wrap_content"
@@ -127,11 +110,8 @@
         android:textSize="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/newGroup_value_eMail"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
 
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2"
-        app:layout_constraintVertical_bias="1.0" />
+        />
 
     <Button
         android:id="@+id/newGroup_cancel_button"
@@ -144,22 +124,20 @@
         android:textColor="@color/white"
         android:textSize="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.004"
         app:layout_constraintStart_toStartOf="@+id/newGroup_value_eMail"
 
 
-        app:layout_constraintVertical_bias="1.0" />
+        />
 
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
+
         android:layout_height="234dp"
 
-        android:layout_marginBottom="24dp"
-
+        android:layout_marginBottom="112dp"
         android:background="@color/tintedBlue"
-        app:layout_constraintBottom_toTopOf="@+id/newGroup_cancel_button"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
@@ -168,9 +146,28 @@
             android:id="@+id/newGroup_scrollView_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical">
+
+        </LinearLayout>
 
     </ScrollView>
+
+    <TextView
+        android:id="@+id/newGroup_groupMember_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue"
+        android:gravity="center"
+        android:paddingTop="8dp"
+
+        android:paddingBottom="8dp"
+        android:text="Gruppenmitglieder"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

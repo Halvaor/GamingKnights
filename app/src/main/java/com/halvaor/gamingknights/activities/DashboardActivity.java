@@ -56,7 +56,6 @@ public class DashboardActivity extends Activity {
             Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
             startActivity(profileActivityIntent);
         });
-
     }
 
     private void initAndFillScrollView(ActivityDashboardBinding binding) {
@@ -69,7 +68,7 @@ public class DashboardActivity extends Activity {
                 QuerySnapshot result = task.getResult();
 
                 if(result.isEmpty()) {
-                    Log.d(TAG, "Could not find next GameNight. UserID: " + userID.getId());
+                    Log.d(TAG, "Could not find Playgroups. UserID: " + userID.getId());
 
                 } else {
                     LinearLayout container = binding.dashboardYourGroupsScrollViewContainer;
@@ -77,7 +76,17 @@ public class DashboardActivity extends Activity {
                     for(QueryDocumentSnapshot document : result) {
                         LinearLayout item = (LinearLayout) getLayoutInflater().inflate(R.layout.view_item, null);
                         TextView textView = item.findViewById(R.id.view_item);
-                        textView.setText(document.getString("Name"));
+                        String groupName = document.getString("Name");
+                        String playgroupID = document.getId();
+
+                        textView.setText(groupName);
+
+                        item.setOnClickListener(view -> {
+                            Intent groupActivityIntent = new Intent(this, GroupActivity.class);
+                            groupActivityIntent.putExtra("playgroupID", playgroupID);
+                            groupActivityIntent.putExtra("groupName", groupName);
+                            startActivity(groupActivityIntent);
+                        });
 
                         container.addView(item);
                     }
@@ -115,6 +124,7 @@ public class DashboardActivity extends Activity {
                     binding.dashboardCardAdressValue.setText(hostAdress);
 
                     //determin if there are votes left open to be done
+                    //ToDo muss wohl noch verfeinert werden, damit auch foodOrder mit einbezogen werden 
 
                     Optional<Object> userVote_foodType = Optional.empty();
                     Map<String, Object> foodTypeVotes = (Map<String, Object>) (result.getDocuments().get(0).get("FoodTypeVotes"));
@@ -135,6 +145,8 @@ public class DashboardActivity extends Activity {
                         binding.dashboardCardTableReminderValue.setText("Offen");
                         binding.dashboardCardTableReminderValue.setTextColor(getResources().getColor(R.color.lightRed, getTheme()));
                     }
+
+                    //toDo Intent zur entspr. GameNight muss noch eingefürgt werden, sobald diese Activity existiert.
                 }
             } else {
                 Log.d(TAG, "Failed to retrieve Data for next GameNight. ", task.getException());

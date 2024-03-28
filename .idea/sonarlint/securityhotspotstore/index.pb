@@ -30,3 +30,7 @@ m
 =app/src/main/java/com/halvaor/gamingknights/IDs/IdPrefix.java,b/9/b92d76ae429f6c2a7405070ca566ceb07874dbaf
 {
 Kapp/src/main/java/com/halvaor/gamingknights/activities/ProfileActivity.java,9/4/945793fbdc31eeb80f55e499910469e798176a73
+y
+Iapp/src/main/java/com/halvaor/gamingknights/activities/GroupActivity.java,b/c/bc2c54341e6ae5985b5b1523a86bc2811d504161
+}
+Mapp/src/main/java/com/halvaor/gamingknights/activities/EditGroupActivity.java,7/1/71406d1be24da074f16bc678cb79400a1720d187
