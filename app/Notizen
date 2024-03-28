@@ -1,4 +1,13 @@
 - Länge von allen daten, die auf dem dashboard (cardview) angezeigt werden limitieren
 - Ratings begrenzen von 1 bis 6
+- Hinter allen Buttons sollten linearLayouts eingefügt werden und für die Buttons layout-weights angegeben werden
 
-- Gruppe bearbeiten Maske anpassen. Die Buttons sind nicht zielführend, da bereits vor dem "Speichern" neue Daten auf die db geschoben werden.
+Profil:
+- Nach dem Speichern auf der View "Profil" bedarf es eines Feedbacks
+
+Dashboard:
+- Dashboard auf Dashboard-Seite als Überschrift verwenden
+- Name vielleicht kleiner in den Header schreiben
+
+EditGroup:
+

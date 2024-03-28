@@ -11,7 +11,6 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -126,14 +125,14 @@ public class NewGroupActivity extends Activity {
             Toast.makeText(NewGroupActivity.this, "Bitte gib einen Gruppennamen an.",
                     Toast.LENGTH_SHORT).show();
         } else {
-            insertPlaygroupAndDepositMembership(playgroupRef, playgroupID, groupName);
+            insertPlaygroupAndAddMemberships(playgroupRef, playgroupID, groupName);
 
             Intent dashboardIntent = new Intent(this, DashboardActivity.class);
             startActivity(dashboardIntent);
         }
     }
 
-    private void insertPlaygroupAndDepositMembership(CollectionReference playgroupRef, PlaygroupID playgroupID, String groupName) {
+    private void insertPlaygroupAndAddMemberships(CollectionReference playgroupRef, PlaygroupID playgroupID, String groupName) {
         Runnable runnable = () -> {
             Map<String, Object> groupData = new HashMap<>();
             groupData.put("Name", groupName);

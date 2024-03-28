@@ -1,6 +1,8 @@
 package com.halvaor.gamingknights.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +25,9 @@ import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityEditGroupBinding;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class EditGroupActivity extends Activity {
@@ -46,13 +50,14 @@ public class EditGroupActivity extends Activity {
         setContentView(this.binding.getRoot());
         container = this.binding.editGroupScrollViewContainer;
 
-        database = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
-        userMails = new ArrayList<>();
-
+        this.database = FirebaseFirestore.getInstance();
+        this.auth = FirebaseAuth.getInstance();
+        this.userMails = new ArrayList<>();
         this.playgroupID = getIntent().getExtras().getString("playgroupID");
         this.groupName = getIntent().getExtras().getString("groupName");
         this.userID = new UserID(auth.getUid());
+
+        determineGroupMembers();
 
         this.binding.editGroupCancelButton.setOnClickListener(view -> {
             Intent groupActivityIntent = new Intent(this, GroupActivity.class);
@@ -61,12 +66,171 @@ public class EditGroupActivity extends Activity {
             startActivity(groupActivityIntent);
         });
 
-        determineGroupMembers();
-
         this.binding.editGroupAddUserButton.setOnClickListener(view -> {
             validateAndAddUser();
         });
 
+        this.binding.editGroupChangeGroupNameButton.setOnClickListener(view -> {
+            changeGroupName();
+        });
+
+        this.binding.profileDeleteGroupButton.setOnClickListener(view -> {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            dialogBuilder.setMessage("Möchten sie die Gruppe wirklich löschen?");
+            dialogBuilder.setCancelable(true);
+
+            dialogBuilder.setPositiveButton(
+                    "Ja",
+                    (dialog, id) -> {
+                        dialog.cancel();
+
+                        deletePlaygroup();
+
+                        Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
+                        startActivity(dashboardActivityIntent);
+                    });
+
+            dialogBuilder.setNegativeButton(
+                    "Nein",
+                    (dialog, id) -> {
+                        dialog.cancel();
+                    });
+
+            AlertDialog alertDialog = dialogBuilder.create();
+            alertDialog.show();
+        });
+    }
+
+    private void deletePlaygroup() {
+        Runnable runnable = () -> {
+            removeMemberships();
+            deleteRelatedGameNights();
+            deletePlaygroupFromPlaygroupCollection();
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+    private void removeMemberships() {
+        Query query = database.collection("User").whereArrayContains("Membership", this.playgroupID);
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot result = task.getResult();
+                if (result.isEmpty()) {
+                    Log.d(TAG, "Could not find any User who is a member of playgroupID: " + this.playgroupID);
+                } else {
+                    for(QueryDocumentSnapshot documentSnapshot : result) {
+                        DocumentReference userRef = database.collection("User").document(documentSnapshot.getId());
+                        userRef.update("Membership", FieldValue.arrayRemove(this.playgroupID));
+                        Log.d(TAG, "Successfully deleted playgroupID of Membership-Array for User: " + documentSnapshot.getId());
+                    }
+                }
+            } else {
+                Log.d(TAG, "Failed to retrieve members of playgroupID: " + this.playgroupID);
+            }
+        });
+    }
+
+    private void deleteRelatedGameNights() {
+        Query query = database.collection("GameNight").whereEqualTo("PlaygroupID", this.playgroupID);
+        query.get().addOnCompleteListener(getGameNightsTask -> {
+            if (getGameNightsTask.isSuccessful()) {
+                QuerySnapshot result = getGameNightsTask.getResult();
+                if (result.isEmpty()) {
+                    Log.d(TAG, "Could not find any GameNight for playgroupID: " + this.playgroupID);
+                } else {
+                    for(QueryDocumentSnapshot documentSnapshot : result) {
+                        DocumentReference gameNightRef = database.collection("GameNight").document(documentSnapshot.getId());
+                        gameNightRef.delete().addOnCompleteListener(deleteGameNightTask -> {
+                            if(deleteGameNightTask.isSuccessful()) {
+                                Log.d(TAG, "Successfully deleted GameNight with ID: " + gameNightRef.getId());
+                            } else {
+                                Log.d(TAG, "Failed to delete GameNight with ID: " + gameNightRef.getId());
+                            }
+                        });
+                    }
+                }
+            } else {
+                Log.d(TAG, "Failed to retrieve GameNights of playgroupID: " + this.playgroupID);
+            }
+        });
+    }
+
+    private void deletePlaygroupFromPlaygroupCollection() {
+        DocumentReference playgroupRef = database.collection("Playgroup").document(this.playgroupID);
+        playgroupRef.delete().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                Log.d(TAG, "Successfully deleted Playgroup with ID: " + this.playgroupID);
+            } else {
+                Log.d(TAG, "Failed to delete Playgroup with ID: " + this.playgroupID);
+            }
+        });
+    }
+
+    private void changeGroupName() {
+        String groupName = Optional.of(String.valueOf(binding.editGroupValueGroupname.getText())).orElse("");
+
+        if(groupName.isEmpty()) {
+            binding.editGroupDescriptionGroupname.setTextColor(getResources().getColor(R.color.lightRed));
+            Toast.makeText(this, "Bitte geben Sie einen Gruppenname an.", Toast.LENGTH_SHORT).show();
+        } else {
+            binding.editGroupDescriptionGroupname.setTextColor(getResources().getColor(R.color.black));
+
+            Runnable runnable = () -> {
+                updateGroupNameInPlaygroup(groupName);
+                updateGroupNameInUpcomingGameNights(groupName);
+            };
+
+            Thread thread = new Thread(runnable);
+            thread.start();
+        }
+        Toast.makeText(this, "Änderung veranlasst.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateGroupNameInUpcomingGameNights(String groupName) {
+        Map<String, Object> updateGameNightsData = new HashMap<>();
+        updateGameNightsData.put("PlaygroupName", groupName);
+
+        Query upcomingGameNights = database.collection("GameNight")
+                .whereGreaterThan("DateTime", Timestamp.now())
+                .whereEqualTo("PlaygroupID", this.playgroupID);
+
+        upcomingGameNights.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                QuerySnapshot result = task.getResult();
+                if(result.isEmpty()) {
+                    Log.d(TAG, "Could not find next GameNight for playgroupID: " + playgroupID);
+                }else {
+                    for(QueryDocumentSnapshot gameNightDocument : result) {
+                        DocumentReference gameNightRef = database.collection("GameNight").document(gameNightDocument.getId());
+                        gameNightRef.update(updateGameNightsData).addOnCompleteListener(updateTask -> {
+                            if(updateTask.isSuccessful()) {
+                                Log.d(TAG, "Successfully changed PlaygroupName to " + updateGameNightsData.get("PlaygroupName") + " for upcoming GameNights");
+                            } else {
+                                Log.d(TAG, "Failed to change PlaygroupName to " + updateGameNightsData.get("PlaygroupName") + " for upcoming GameNights");
+                            }
+                        });
+                    }
+                }
+            } else {
+                Log.d(TAG, "Failed to retrieve GameNights with PlaygroupID: " + this.playgroupID);
+            }
+        });
+    }
+
+    private void updateGroupNameInPlaygroup(String groupName) {
+        Map<String, Object> updatePlaygroupData = new HashMap<>();
+        updatePlaygroupData.put("Name", groupName);
+        DocumentReference playgroupRef = database.collection("Playgroup").document(this.playgroupID);
+
+        playgroupRef.update(updatePlaygroupData).addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                Log.d(TAG, "Successfully changed PlaygroupName to " + updatePlaygroupData.get("Name") + " for Playgroup: " + this.playgroupID);
+            } else {
+                Log.d(TAG, "Failed to change PlaygroupName to " + updatePlaygroupData.get("Name") + " for Playgroup: " + this.playgroupID);
+            }
+        });
     }
 
     private void validateAndAddUser() {
@@ -173,17 +337,36 @@ public class EditGroupActivity extends Activity {
         button.setTag(document.getId());
 
         button.setOnClickListener(view -> {
-            String userIDToRemove = (String) view.getTag();
-            removeUserFromPlaygroup(userIDToRemove, this.playgroupID);
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            dialogBuilder.setMessage("Möchten sie das Mitglied wirklich löschen?");
+            dialogBuilder.setCancelable(true);
 
-            //Removed user was myself
-            if(userIDToRemove.equals(new UserID(auth.getUid()).getId())) {
-                Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
-                startActivity(dashboardActivityIntent);
-            } else {
-                this.container.removeAllViews();
-                determineGroupMembers();
-            }
+            dialogBuilder.setPositiveButton(
+                    "Ja",
+                    (dialog, id) -> {
+                        dialog.cancel();
+
+                        String userIDToRemove = (String) view.getTag();
+                        removeUserFromPlaygroup(userIDToRemove, this.playgroupID);
+
+                        //Removed user was current user
+                        if(userIDToRemove.equals(new UserID(auth.getUid()).getId())) {
+                            Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
+                            startActivity(dashboardActivityIntent);
+                        } else {
+                            this.container.removeAllViews();
+                            determineGroupMembers();
+                        }
+                    });
+
+            dialogBuilder.setNegativeButton(
+                    "Nein",
+                    (dialog, id) -> {
+                        dialog.cancel();
+                    });
+
+            AlertDialog alertDialog = dialogBuilder.create();
+            alertDialog.show();
         });
     }
 
