@@ -25,6 +25,8 @@ import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityEditGroupBinding;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +76,7 @@ public class EditGroupActivity extends Activity {
             changeGroupName();
         });
 
-        this.binding.profileDeleteGroupButton.setOnClickListener(view -> {
+        this.binding.editGroupDeleteGroupButton.setOnClickListener(view -> {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
             dialogBuilder.setMessage("Möchten sie die Gruppe wirklich löschen?");
             dialogBuilder.setCancelable(true);
@@ -235,7 +237,7 @@ public class EditGroupActivity extends Activity {
 
     private void validateAndAddUser() {
         Runnable runnable = () -> {
-            String eMail = Optional.ofNullable(binding.editGroupValueEMail.getText().toString()).orElse("");
+            String eMail = Optional.of(String.valueOf(binding.editGroupValueEMail.getText())).orElse("");
 
             CollectionReference userRef = database.collection("User");
             Query query = userRef.whereEqualTo("Email", eMail);
@@ -281,6 +283,7 @@ public class EditGroupActivity extends Activity {
             if(task.isSuccessful()) {
                 Log.d(TAG, "Successfully added user " + userID + " to members of the Playgroup " + this.playgroupID + ".");
                 addMembership(userID);
+                addUserToHosts(userID);
             }else {
                 Log.d(TAG, "Failed to add user " + userID + " to members of the Playgroup " + this.playgroupID + ".");
             }
@@ -296,6 +299,22 @@ public class EditGroupActivity extends Activity {
                 determineGroupMembers();
             }else {
                 Log.d(TAG, "Failed to add playgroup " + this.playgroupID + " To the memberships of user " + userID + ".");
+            }
+        });
+    }
+
+    private void addUserToHosts(String userID) {
+        Map<String, Object> hostData = new HashMap<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(1900, Calendar.JANUARY, 1);
+        hostData.put("LastTimeHosting", new Timestamp(calendar.getTime()));
+
+        CollectionReference hostRef = database.collection("Playgroup").document(playgroupID).collection("Host");
+        hostRef.document(userID).set(hostData).addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                Log.d(TAG, "Successfully added user " + userID + " to the Hosts of playgroup " + this.playgroupID + ".");
+            }else {
+                Log.d(TAG, "Failed to add user " + userID + " to the Hosts of playgroup " + this.playgroupID + ".");
             }
         });
     }
@@ -373,12 +392,25 @@ public class EditGroupActivity extends Activity {
     private void removeUserFromPlaygroup(String userIDToRemove, String playgroupID) {
         Runnable runnable = () -> {
 
+            //remove membership
             DocumentReference userRef = database.collection("User").document(userIDToRemove);
             userRef.update("Membership", FieldValue.arrayRemove(playgroupID));
 
+            //remove from members
             DocumentReference playgroupRef = database.collection("Playgroup").document(playgroupID);
             playgroupRef.update("Members", FieldValue.arrayRemove(userIDToRemove));
 
+            //remove from Host
+            DocumentReference hostRef = database.collection("Playgroup").document(playgroupID).collection("Host").document(userIDToRemove);
+            hostRef.delete().addOnCompleteListener((task) -> {
+                if(task.isSuccessful()) {
+                    Log.d(TAG, "User " + userIDToRemove + " was successfully removed from Host-Collection.");
+                } else {
+                    Log.d(TAG, "Failed to remove User " + userIDToRemove + "from Host-Collection.");
+                }
+            });
+
+            //remove from upcoming game nights
             Query upcomingGameNights = database.collection("GameNight")
                     .whereGreaterThan("DateTime", Timestamp.now())
                     .whereArrayContains("Participants", userIDToRemove);
