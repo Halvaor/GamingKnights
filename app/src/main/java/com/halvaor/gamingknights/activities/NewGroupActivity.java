@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -30,8 +31,8 @@ import java.util.Optional;
 public class NewGroupActivity extends Activity {
 
     private static final String TAG = "NewGroupActivity";
-    private List<String> groupMemberEMail = new ArrayList<>();
-    private List<String> groupMemberUserID = new ArrayList<>();
+    private List<String> groupMemberEMails = new ArrayList<>();
+    private List<String> groupMemberUserIDs = new ArrayList<>();
     private FirebaseFirestore database;
     private FirebaseAuth auth;
 
@@ -45,8 +46,8 @@ public class NewGroupActivity extends Activity {
         setContentView(binding.getRoot());
 
         //add current user
-        groupMemberUserID.add(new UserID(auth.getUid()).getId());
-        groupMemberEMail.add(Objects.requireNonNull(auth.getCurrentUser()).getEmail());
+        groupMemberUserIDs.add(new UserID(auth.getUid()).getId());
+        groupMemberEMails.add(Objects.requireNonNull(auth.getCurrentUser()).getEmail());
         fillUserView(binding);
 
         //setListeners
@@ -63,7 +64,7 @@ public class NewGroupActivity extends Activity {
         container.removeAllViews();
 
         //fill container
-        for (String member : groupMemberEMail) {
+        for (String member : groupMemberEMails) {
             LinearLayout item = (LinearLayout) getLayoutInflater().inflate(R.layout.view_item, null);
             TextView textView = item.findViewById(R.id.view_item);
             textView.setText(member);
@@ -73,7 +74,7 @@ public class NewGroupActivity extends Activity {
     }
 
     private void addUser(ActivityNewGroupBinding binding) {
-            String eMail = Optional.ofNullable(binding.newGroupValueEMail.getText().toString()).orElse("");
+            String eMail = Optional.of(String.valueOf(binding.newGroupValueEMail.getText())).orElse("");
 
             CollectionReference userRef = database.collection("User");
             Query query = userRef.whereEqualTo("Email", eMail);
@@ -91,17 +92,17 @@ public class NewGroupActivity extends Activity {
                         binding.newGroupDescriptionEMail.setTextColor(getResources().getColor(R.color.lightRed));
                     } else {
                         //duplication check
-                        if(groupMemberEMail.contains(eMail) || groupMemberUserID.contains(result.getDocuments().get(0).getId())) {
+                        if(groupMemberEMails.contains(eMail) || groupMemberUserIDs.contains(result.getDocuments().get(0).getId())) {
                             Log.d(TAG, "User already added to list of groupmembers: " + eMail);
                             Toast.makeText(NewGroupActivity.this, "User bereits hinterlegt.", Toast.LENGTH_SHORT).show();
                         } else {
                             Log.d(TAG, "Found User with given E-Mail: " + eMail);
-                            groupMemberEMail.add(eMail);
                             binding.newGroupDescriptionEMail.setTextColor(getResources().getColor(R.color.black));
                             binding.newGroupValueEMail.setText("");
 
-                            //save userID of added user
-                            groupMemberUserID.add(result.getDocuments().get(0).getId());
+                            //add User to Lists
+                            groupMemberEMails.add(eMail);
+                            groupMemberUserIDs.add(result.getDocuments().get(0).getId());
 
                             fillUserView(binding);
                         }
@@ -115,10 +116,11 @@ public class NewGroupActivity extends Activity {
 
     private void createGroup(ActivityNewGroupBinding binding) {
         CollectionReference playgroupRef = database.collection("Playgroup");
+        //Generate documentID
         PlaygroupID playgroupID = new PlaygroupID(playgroupRef.document().getId());
 
         //Get and validate GroupName
-        String groupName = Optional.ofNullable(binding.newGroupValueGroupname.getText().toString()).orElse("");
+        String groupName = Optional.of(String.valueOf(binding.newGroupValueGroupname.getText())).orElse("");
         if(groupName.isEmpty()) {
             Log.w(TAG, "GroupName is empty");
             binding.newGroupDescriptionGroupname.setTextColor(getResources().getColor(R.color.lightRed));
@@ -134,15 +136,24 @@ public class NewGroupActivity extends Activity {
 
     private void insertPlaygroupAndAddMemberships(CollectionReference playgroupRef, PlaygroupID playgroupID, String groupName) {
         Runnable runnable = () -> {
+            //insert Playgroup
             Map<String, Object> groupData = new HashMap<>();
             groupData.put("Name", groupName);
-            groupData.put("Members", groupMemberUserID);
+            groupData.put("Members", this.groupMemberUserIDs);
 
             playgroupRef.document(playgroupID.getId()).set(groupData);
 
-            for(String userID : groupMemberUserID) {
+            Map<String, Object> hostData = new HashMap<>();
+            hostData.put("LastTimeHosting", Timestamp.now());
+
+            //Update Membership
+            for(String userID : this.groupMemberUserIDs) {
                 DocumentReference userDocument = database.collection("User").document(userID);
                 userDocument.update("Membership", FieldValue.arrayUnion(playgroupID.getId()));
+
+                //Insert Hosts
+                CollectionReference hostRef = database.collection("Playgroup").document(playgroupID.getId()).collection("Host");
+                hostRef.document(userID).set(hostData);
             }
         };
 

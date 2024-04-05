@@ -187,7 +187,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/profile_deleteGroup_button"
+        android:id="@+id/editGroup_deleteGroup_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 

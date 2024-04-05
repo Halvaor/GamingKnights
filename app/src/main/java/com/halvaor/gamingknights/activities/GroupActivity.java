@@ -58,6 +58,13 @@ public class GroupActivity extends Activity {
             startActivity(dashboardActivityIntent);
         });
 
+        binding.groupCreateGameNightButton.setOnClickListener(view -> {
+            Intent createGameNightIntent = new Intent(this, CreateGameNightActivity.class);
+            createGameNightIntent.putExtra("playgroupID", this.playgroupID);
+            createGameNightIntent.putExtra("groupName", this.groupName);
+            startActivity(createGameNightIntent);
+        });
+
         getNextGameNightAndFillDashboard(binding);
         initAndFillScrollView(binding);
 
