@@ -46,3 +46,9 @@ t
 Dapp/src/main/java/com/halvaor/gamingknights/DatePickerInterface.java,a/c/acc84cabcffdc30609aa401158ce665233d14c80
 e
 5app/src/main/java/com/halvaor/gamingknights/User.java,8/d/8d0f5dd821bbda748f2986aca146e0ffe7afffc7
+C
+settings.gradle.kts,7/4/749edfcc96398253e5b3416184e95c46621da850
+A
+gradle.properties,2/a/2afbb999f001938c88fa43fc2ef52abf0f8213e4
+p
+@app/src/main/java/com/halvaor/gamingknights/IDs/GameNightID.java,c/9/c9bca5bde3c75b4ecdde36161680bb9996c3e6a8

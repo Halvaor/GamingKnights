@@ -1,12 +1,12 @@
 package com.halvaor.gamingknights.activities;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
@@ -16,17 +16,17 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.type.Date;
 import com.halvaor.gamingknights.DatePickerFragment;
 import com.halvaor.gamingknights.DatePickerInterface;
-import com.halvaor.gamingknights.IDs.UserID;
+import com.halvaor.gamingknights.IDs.GameNightID;
 import com.halvaor.gamingknights.TimePickerFragment;
 import com.halvaor.gamingknights.TimePickerInterface;
 import com.halvaor.gamingknights.User;
 import com.halvaor.gamingknights.databinding.ActivityCreateGamenightBinding;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CreateGameNightActivity extends FragmentActivity implements TimePickerInterface, DatePickerInterface {
 
@@ -55,16 +56,12 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.binding = ActivityCreateGamenightBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        init();
+        bindListeners();
+        determineNextHost();
+    }
 
-        this.database = FirebaseFirestore.getInstance();
-        this.hostNames = new ArrayList<>();
-        this.potentialHosts = new ArrayList<>();
-
-        this.playgroupID = getIntent().getExtras().getString("playgroupID");
-        this.groupName = getIntent().getExtras().getString("groupName");
-
+    private void bindListeners() {
         binding.createGameNightCancelButton.setOnClickListener(view -> {
             Intent playgroupIntent = new Intent(this, GroupActivity.class);
             playgroupIntent.putExtra("playgroupID", playgroupID);
@@ -95,28 +92,90 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
         });
 
         binding.createGameNightCreateButton.setOnClickListener(view -> {
-            //GameNight anlegen
-            /*
-            - validieren ob alle Felder ausgefüllt sind //done
-            - GameNight anlegen
-            - Auf GameNight Activity wechseln (mind. gameNightID muss bekannt sein)
-             */
-
-            String host = Optional.of(String.valueOf(binding.createGameNightValueHost.getText())).orElse("");
-            String time = Optional.of(String.valueOf(binding.createGameNightValueTime.getText())).orElse("");
-            String date = Optional.of(String.valueOf(binding.createGameNightValueDate.getText())).orElse("");
-
-            if(host.isEmpty() || time.isEmpty() || date.isEmpty()) {
-                Toast.makeText(this, "Bitte fülle alle Felder aus.", Toast.LENGTH_SHORT).show();
-            } else {
-                Map<String, Object> gameNightData = new HashMap<>();
-                LocalDateTime.of(this.year, this.month, this.day, this.hour, this.minute);
-                gameNightData.put("DateTime", Timestamp
-            }
+            createAndInsertGameNight();
         });
+    }
 
+    private void init() {
+        this.binding = ActivityCreateGamenightBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        determineNextHost();
+        this.database = FirebaseFirestore.getInstance();
+        this.hostNames = new ArrayList<>();
+        this.potentialHosts = new ArrayList<>();
+
+        this.playgroupID = getIntent().getExtras().getString("playgroupID");
+        this.groupName = getIntent().getExtras().getString("groupName");
+    }
+
+    private void createAndInsertGameNight() {
+        String host = Optional.of(String.valueOf(binding.createGameNightValueHost.getText())).orElse("");
+        String time = Optional.of(String.valueOf(binding.createGameNightValueTime.getText())).orElse("");
+        String date = Optional.of(String.valueOf(binding.createGameNightValueDate.getText())).orElse("");
+
+        if(host.isEmpty() || time.isEmpty() || date.isEmpty()) {
+            Toast.makeText(this, "Bitte fülle alle Felder aus.", Toast.LENGTH_SHORT).show();
+        } else {
+            Map<String, Object> gameNightData = buildGameNightData();
+
+            //Generate documentID
+            CollectionReference gameNightRef = database.collection("GameNight");
+            GameNightID gameNightID = new GameNightID(gameNightRef.document().getId());
+
+            //Insert new gameNight
+            database.collection("GameNight").document(gameNightID.getId()).set(gameNightData)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "Successfully inserted gameNight " + gameNightID.getId() + " into database");
+                    })
+                    .addOnFailureListener(e -> {
+                            Log.d(TAG, "Failed to inserted gameNight " + gameNightID.getId() + " into database", e);
+                    });
+
+            //Todo es muss noch ein Intent erzeugt werden, der auf die neue GameNight Activity führt.
+        }
+    }
+
+    @NonNull
+    private Map<String, Object> buildGameNightData() {
+        LocalDateTime localDateTime = LocalDateTime.of(this.year, this.month, this.day, this.hour, this.minute);
+        Instant gameNightInstant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+
+        Map<String, Object> gameNightData = new HashMap<>();
+        Map<String, Object> deliveryService = new HashMap<>();
+        Map<String, Object> foodOrders = new HashMap<>();
+        Map<String, Object> foodRatings = new HashMap<>();
+        Map<String, Object> foodTypeVotes = new HashMap<>();
+        Map<String, Object> gameSuggestionVotes = new HashMap<>();
+        Map<String, Object> generalRatings = new HashMap<>();
+        Map<String, Object> hostRatings = new HashMap<>();
+        Map<String, Object> hostData = new HashMap<>();
+        List<String> gameSuggestions = new ArrayList<>();
+
+        hostData.put("FirstName", this.chosenHost.getFirstName());
+        hostData.put("LastName", this.chosenHost.getLastName());
+        hostData.put("HouseNumber", this.chosenHost.getHouseNumber());
+        hostData.put("PostalCode", this.chosenHost.getPostalCode());
+        hostData.put("Street", this.chosenHost.getStreet());
+        hostData.put("Town", this.chosenHost.getTown());
+        hostData.put("UserID", this.chosenHost.getUserID());
+
+        List<String> participantsUserIDs = this.potentialHosts.stream().map(user -> user.getUserID()).collect(Collectors.toList());
+
+        gameNightData.put("DateTime", new Timestamp(gameNightInstant.getEpochSecond(),0));
+        gameNightData.put("DeliveryService", deliveryService);
+        gameNightData.put("FoodOrders", foodOrders);
+        gameNightData.put("FoodRatings", foodRatings);
+        gameNightData.put("FoodTypeVotes", foodTypeVotes);
+        gameNightData.put("GameSuggestionVotes", gameSuggestionVotes);
+        gameNightData.put("GeneralRatings", generalRatings);
+        gameNightData.put("HostRatings", hostRatings);
+        gameNightData.put("GameSuggestions", gameSuggestions);
+        gameNightData.put("Participants", participantsUserIDs);
+        gameNightData.put("PlaygroupID", this.playgroupID);
+        gameNightData.put("PlaygroupName", this.groupName);
+        gameNightData.put("Host", hostData);
+
+        return gameNightData;
     }
 
     private void determineNextHost() {
@@ -132,7 +191,6 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
 
                     retrieveUserData(hostIDs);
 
-                    //ToDo Host Daten müssen aus "User" entnommen und in GameNight geschrieben werden (erst beim commit)
                 }
             } else {
                 Log.d(TAG, "Failed to determined host");
