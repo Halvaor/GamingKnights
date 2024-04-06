@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.halvaor.gamingknights.IDs.UserID;
+import com.halvaor.gamingknights.domain.id.UserID;
 import com.halvaor.gamingknights.databinding.ActivityProfileBinding;
 
 import java.util.HashMap;

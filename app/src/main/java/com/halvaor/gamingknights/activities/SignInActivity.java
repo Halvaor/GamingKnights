@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivitySigninBinding;
-import com.halvaor.gamingknights.IDs.UserID;
+import com.halvaor.gamingknights.domain.id.UserID;
 
 import java.util.HashMap;
 import java.util.Map;

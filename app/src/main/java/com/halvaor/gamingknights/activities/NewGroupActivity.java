@@ -16,8 +16,8 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.halvaor.gamingknights.IDs.PlaygroupID;
-import com.halvaor.gamingknights.IDs.UserID;
+import com.halvaor.gamingknights.domain.id.PlaygroupID;
+import com.halvaor.gamingknights.domain.id.UserID;
 import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityNewGroupBinding;
 

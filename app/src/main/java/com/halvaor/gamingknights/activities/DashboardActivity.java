@@ -19,7 +19,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityDashboardBinding;
-import com.halvaor.gamingknights.IDs.UserID;
+import com.halvaor.gamingknights.domain.id.UserID;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,6 +55,12 @@ public class DashboardActivity extends Activity {
         binding.dashboardToolbarEditbutton.setOnClickListener(view -> {
             Intent profileActivityIntent = new Intent(this, ProfileActivity.class);
             startActivity(profileActivityIntent);
+        });
+
+        binding.dashboardCardView.setOnClickListener(view -> {
+            Intent gameNightActivity = new Intent(this, GameNightActivity.class);
+            startActivity(gameNightActivity);
+            //ToDo zunächst nur testweise implementiert; Muss noch auf die richtige GameNight verweisen
         });
     }
 

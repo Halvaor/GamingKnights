@@ -1,4 +1,4 @@
-package com.halvaor.gamingknights;
+package com.halvaor.gamingknights.domain;
 
 public class User {
 

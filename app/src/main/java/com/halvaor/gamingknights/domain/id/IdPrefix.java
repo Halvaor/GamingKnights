@@ -1,4 +1,4 @@
-package com.halvaor.gamingknights.IDs;
+package com.halvaor.gamingknights.domain.id;
 
 public class IdPrefix {
 

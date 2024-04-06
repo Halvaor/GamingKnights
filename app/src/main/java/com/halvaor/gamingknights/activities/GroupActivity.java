@@ -14,7 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.halvaor.gamingknights.IDs.UserID;
+import com.halvaor.gamingknights.domain.id.UserID;
 import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityGroupBinding;
 

@@ -9,5 +9,8 @@ Dashboard:
 - Dashboard auf Dashboard-Seite als Überschrift verwenden
 - Name vielleicht kleiner in den Header schreiben
 
-EditGroup:
+GameNight:
+- gameNight_gameProposal_container
+- gameNight_foodProposal_container
+- gameNight_foodOrder_container
 
