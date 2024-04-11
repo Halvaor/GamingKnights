@@ -1,6 +1,8 @@
 - Länge von allen daten, die auf dem dashboard (cardview) angezeigt werden limitieren
 - Ratings begrenzen von 1 bis 6
 - Hinter allen Buttons sollten linearLayouts eingefügt werden und für die Buttons layout-weights angegeben werden
+- Rurück geste nach dem Ausloggen muss blockiert werden
+- ggf. müssen bei den Intents die sourcen der Activity mitgeliefert werden, damit ein enprechendes (zurück) implementiert werden kann
 
 Profil:
 - Nach dem Speichern auf der View "Profil" bedarf es eines Feedbacks
@@ -8,9 +10,14 @@ Profil:
 Dashboard:
 - Dashboard auf Dashboard-Seite als Überschrift verwenden
 - Name vielleicht kleiner in den Header schreiben
+- Wenn von GameNight mit zurückgeste auf Dashboard gewechselt wird, dann werden aktualisierte spieleabende nicht berücksichtigt
+  (müssen beim Wechsel neu gezogen werden)
 
 GameNight:
 - gameNight_gameProposal_container
 - gameNight_foodProposal_container
 - gameNight_foodOrder_container
+- Nach TimePicker wird Zeit nicht im 24h Format angezeigt  
+
+- Beim Wechsel auf die GameNight Seite muss stets die jeweilige GameNightID mitgeliefert werden
 

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +33,7 @@ public class DashboardActivity extends Activity {
     private UserID userID;
     private FirebaseAuth auth;
     private FirebaseFirestore database;
+    private String nextGameNightID = "";
 
 
     @Override
@@ -58,8 +60,13 @@ public class DashboardActivity extends Activity {
         });
 
         binding.dashboardCardView.setOnClickListener(view -> {
-            Intent gameNightActivity = new Intent(this, GameNightActivity.class);
-            startActivity(gameNightActivity);
+            if(this.nextGameNightID.isEmpty()) {
+                Toast.makeText(this, "Keinen anstehenden Spieleabend gefunden", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent gameNightActivity = new Intent(this, GameNightActivity.class);
+                gameNightActivity.putExtra("gameNightID", this.nextGameNightID);
+                startActivity(gameNightActivity);
+            }
             //ToDo zunächst nur testweise implementiert; Muss noch auf die richtige GameNight verweisen
         });
     }
@@ -118,6 +125,8 @@ public class DashboardActivity extends Activity {
                 if(result.isEmpty()) {
                     Log.d(TAG, "Could not find next GameNight. UserID: " + userID.getId());
                 } else {
+                    this.nextGameNightID = result.getDocuments().get(0).getId();
+
                     binding.dashboardCardPlaygroupValue.setText(result.getDocuments().get(0).getString("PlaygroupName"));
 
                     Date date = result.getDocuments().get(0).getTimestamp("DateTime").toDate();

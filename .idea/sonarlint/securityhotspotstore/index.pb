@@ -44,3 +44,11 @@ z
 Japp/src/main/java/com/halvaor/gamingknights/dialog/DatePickerFragment.java,9/4/9488aeb3005884681271d79161900507607ed7e8
 }
 Mapp/src/main/java/com/halvaor/gamingknights/activities/GameNightActivity.java,3/4/341307510855bb04dc53eadf9f4293ff64018c92
+{
+Kapp/src/main/java/com/halvaor/gamingknights/dialog/TimePickerInterface.java,d/4/d4ec351ddb3738b20580ca5e2e76ccd497367687
+z
+Japp/src/main/java/com/halvaor/gamingknights/dialog/TimePickerFragment.java,4/b/4bea4d4b8252e9939165d260cddf8144051fbfd6
+l
+<app/src/main/java/com/halvaor/gamingknights/domain/User.java,d/6/d6a38b3b4ffa9fbf5e11630fd64f1a2516af8dc9
+_
+/app/src/main/res/layout/activity_game_night.xml,4/1/41645a45555a1a6c94ddc24e6cbdd5d968231b97

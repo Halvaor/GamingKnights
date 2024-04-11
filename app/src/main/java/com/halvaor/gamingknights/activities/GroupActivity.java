@@ -209,7 +209,7 @@ public class GroupActivity extends Activity {
     }
 
     private void setFoodRating(QueryDocumentSnapshot document, LinearLayout item) {
-        Map<String, Long> foodRatings = (Map) document.get("FoodRatings");
+        Map<String, Long> foodRatings = (Map<String, Long>) document.get("FoodRatings");
         if(foodRatings != null) {
             Long foodRatingOfUser = foodRatings.get(userID.getId());
             TextView foodRatingElement = item.findViewById(R.id.food_rating);

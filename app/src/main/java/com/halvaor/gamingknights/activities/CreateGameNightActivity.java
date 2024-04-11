@@ -16,24 +16,23 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.halvaor.gamingknights.databinding.ActivityCreateGamenightBinding;
 import com.halvaor.gamingknights.dialog.DatePickerFragment;
 import com.halvaor.gamingknights.dialog.DatePickerInterface;
-import com.halvaor.gamingknights.domain.id.GameNightID;
 import com.halvaor.gamingknights.dialog.TimePickerFragment;
 import com.halvaor.gamingknights.dialog.TimePickerInterface;
 import com.halvaor.gamingknights.domain.User;
-import com.halvaor.gamingknights.databinding.ActivityCreateGamenightBinding;
+import com.halvaor.gamingknights.domain.id.GameNightID;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -133,16 +132,12 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
                             Log.d(TAG, "Failed to inserted gameNight " + gameNightID.getId() + " into database", e);
                     });
 
-            //Todo es muss noch ein Intent erzeugt werden, der auf die neue GameNight Activity führt.
+            //ToDo es muss noch ein Intent erzeugt werden, der auf die neue GameNight Activity führt.
         }
     }
 
     @NonNull
     private Map<String, Object> buildGameNightData() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(this.year, this.month, this.day, this.hour, this.minute);
-
-
         //month +1 because LocalDateTime counts months from 1-12 while Calender, etc. counts from 0-11.
         LocalDateTime localDateTime = LocalDateTime.of(this.year, this.month +1, this.day, this.hour, this.minute);
         Instant gameNightInstant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
@@ -242,9 +237,12 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
 
     @Override
     public void bindTime(int hour, int minute) {
+        LocalTime time = LocalTime.of(hour, minute);
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
         this.hour = hour;
         this.minute = minute;
-        binding.createGameNightValueTime.setText(hour + ":" + minute + " Uhr");
+
+        binding.createGameNightValueTime.setText(time.format(timeFormat) + " Uhr");
     }
 
     @Override
@@ -252,11 +250,13 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
         Calendar calendar = Calendar.getInstance();
         calendar.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
 
-        String monthString = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
         this.month = calendar.get(Calendar.MONTH);
         this.day = calendar.get(Calendar.DAY_OF_MONTH);
         this.year = calendar.get(Calendar.YEAR);
 
-        binding.createGameNightValueDate.setText(this.day + "." + monthString + "." + this.year);
+        LocalDateTime date = LocalDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault());
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        binding.createGameNightValueDate.setText(date.format(dateFormat));
     }
 }
