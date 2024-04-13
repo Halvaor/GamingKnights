@@ -67,8 +67,6 @@ public class GroupActivity extends Activity {
 
         getNextGameNightAndFillDashboard(binding);
         initAndFillScrollView(binding);
-
-
     }
 
     private void getNextGameNightAndFillDashboard(ActivityGroupBinding binding) {
@@ -118,6 +116,12 @@ public class GroupActivity extends Activity {
                         binding.groupCardTableReminderValue.setText("Offen");
                         binding.groupCardTableReminderValue.setTextColor(getResources().getColor(R.color.lightRed, getTheme()));
                     }
+
+                    binding.groupCardView.setOnClickListener(view -> {
+                        Intent intent = new Intent(this, GameNightActivity.class);
+                        intent.putExtra("gameNightID", result.getDocuments().get(0).getId());
+                        startActivity(intent);
+                    });
                 }
             } else {
                 Log.d(TAG, "Failed to retrieve Data for next GameNight. ", task.getException());
@@ -150,6 +154,12 @@ public class GroupActivity extends Activity {
                         setHostRating(document, item);
                         setGeneralRating(document, item);
 
+                        item.setOnClickListener(view -> {
+                            Intent intent = new Intent(this, GameNightActivity.class);
+                            intent.putExtra("gameNightID", document.getId());
+                            startActivity(intent);
+                        });
+
                         container.addView(item);
                     }
                 }
@@ -179,13 +189,13 @@ public class GroupActivity extends Activity {
     }
 
     private void setGeneralRating(QueryDocumentSnapshot document, LinearLayout item) {
-        Map<String, Long> generalRating = (Map) document.get("GeneralRatings");
+        Map<String, Object> generalRating = (Map<String, Object>) document.get("GeneralRatings");
         if(generalRating != null) {
-            Long generalRatingUser = generalRating.get(userID.getId());
+            String generalRatingUser = (String) generalRating.get(userID.getId());
             TextView generalRatingElement = item.findViewById(R.id.general_rating);
 
             if(generalRatingUser != null) {
-                generalRatingElement.setText(String.valueOf(generalRatingUser));
+                generalRatingElement.setText(generalRatingUser);
             }else {
                 generalRatingElement.setText("Offen");
                 generalRatingElement.setTextColor(getResources().getColor(R.color.lightRed));
@@ -194,13 +204,13 @@ public class GroupActivity extends Activity {
     }
 
     private void setHostRating(QueryDocumentSnapshot document, LinearLayout item) {
-        Map<String, Long> hostRating = (Map) document.get("HostRatings");
+        Map<String, Object> hostRating = (Map<String, Object>) document.get("HostRatings");
         if(hostRating != null) {
-            Long hostRatingUser = hostRating.get(userID.getId());
+            String hostRatingUser = (String) hostRating.get(userID.getId());
             TextView hostRatingElement = item.findViewById(R.id.host_rating);
 
             if(hostRatingUser != null) {
-                hostRatingElement.setText(String.valueOf(hostRatingUser));
+                hostRatingElement.setText(hostRatingUser);
             }else {
                 hostRatingElement.setText("Offen");
                 hostRatingElement.setTextColor(getResources().getColor(R.color.lightRed));
@@ -209,13 +219,13 @@ public class GroupActivity extends Activity {
     }
 
     private void setFoodRating(QueryDocumentSnapshot document, LinearLayout item) {
-        Map<String, Long> foodRatings = (Map<String, Long>) document.get("FoodRatings");
+        Map<String, Object> foodRatings = (Map<String, Object>) document.get("FoodRatings");
         if(foodRatings != null) {
-            Long foodRatingOfUser = foodRatings.get(userID.getId());
+            String foodRatingOfUser = (String) foodRatings.get((userID.getId()));
             TextView foodRatingElement = item.findViewById(R.id.food_rating);
 
             if(foodRatingOfUser != null) {
-                foodRatingElement.setText(String.valueOf(foodRatingOfUser));
+                foodRatingElement.setText(foodRatingOfUser);
             }else {
                 foodRatingElement.setText("Offen");
                 foodRatingElement.setTextColor(getResources().getColor(R.color.lightRed));

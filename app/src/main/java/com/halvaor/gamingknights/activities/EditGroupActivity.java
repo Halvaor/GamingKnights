@@ -10,6 +10,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -79,20 +83,15 @@ public class EditGroupActivity extends Activity {
             dialogBuilder.setMessage("Möchten sie die Gruppe wirklich löschen?");
             dialogBuilder.setCancelable(true);
 
-            dialogBuilder.setPositiveButton(
-                    "Ja",
-                    (dialog, id) -> {
+            dialogBuilder.setPositiveButton("Ja", (dialog, id) -> {
                         dialog.cancel();
-
                         deletePlaygroup();
 
                         Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
                         startActivity(dashboardActivityIntent);
                     });
 
-            dialogBuilder.setNegativeButton(
-                    "Nein",
-                    (dialog, id) -> {
+            dialogBuilder.setNegativeButton("Nein", (dialog, id) -> {
                         dialog.cancel();
                     });
 
@@ -282,6 +281,7 @@ public class EditGroupActivity extends Activity {
                 Log.d(TAG, "Successfully added user " + userID + " to members of the Playgroup " + this.playgroupID + ".");
                 addMembership(userID);
                 addUserToHosts(userID);
+                addUserToGameNightParticipants(userID);
             }else {
                 Log.d(TAG, "Failed to add user " + userID + " to members of the Playgroup " + this.playgroupID + ".");
             }
@@ -313,6 +313,27 @@ public class EditGroupActivity extends Activity {
                 Log.d(TAG, "Successfully added user " + userID + " to the Hosts of playgroup " + this.playgroupID + ".");
             }else {
                 Log.d(TAG, "Failed to add user " + userID + " to the Hosts of playgroup " + this.playgroupID + ".");
+            }
+        });
+    }
+
+    private void addUserToGameNightParticipants(String userID) {
+        Map<String, Object> participant = new HashMap<>();
+        participant.put("Participants", FieldValue.arrayUnion(userID));
+
+        Query upcomingGameNights = database.collection("GameNight")
+                .whereGreaterThan("DateTime", Timestamp.now());
+
+        upcomingGameNights.get().addOnSuccessListener(queryDocumentSnapshots -> {
+
+            for(QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                database.collection("GameNight").document(document.getId())
+                        .update(participant).addOnSuccessListener(unused -> {
+                            Log.d(TAG, "Successfully added user " + userID + " to Participants of playgroup.");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.d(TAG, "Failed to added user " + userID + " to Participants of playgroup.", e);
+                        });
             }
         });
     }

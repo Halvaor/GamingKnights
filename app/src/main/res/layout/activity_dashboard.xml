@@ -38,7 +38,7 @@
         android:id="@+id/dashboard_toolbar_Name_View"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="firstname lastname"
+        android:text=""
         android:textColor="@color/white"
         android:textSize="20dp"
         android:paddingLeft="10dp"

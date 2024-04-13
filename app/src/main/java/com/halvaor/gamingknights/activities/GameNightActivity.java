@@ -1,5 +1,7 @@
 package com.halvaor.gamingknights.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -50,7 +52,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
     private FirebaseAuth auth;
     private String userID;
     private List<String> participantNames;
-    private List<User> participants;
+    private List<User> usersOfGameNight;
     private DocumentSnapshot gameNightData;
     private List<String> gameSuggestions;
     private List<String> foodTypes;
@@ -59,6 +61,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
     private Map<String, String> foodOrders;
     private String deliveryServiceUrl = "";
     private String deliveryServiceName = "";
+
     private int hour;
     private int minute;
     private int month;
@@ -71,7 +74,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
         super.onCreate(savedInstanceState);
         this.database = FirebaseFirestore.getInstance();
         this.auth = FirebaseAuth.getInstance();
-        this.participants = new ArrayList<>();
+        this.usersOfGameNight = new ArrayList<>();
         this.participantNames = new ArrayList<>();
         this.gameSuggestions = new ArrayList<>();
         this.foodTypes = new ArrayList<>();
@@ -109,13 +112,223 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
         binding.gameNightFoodOrderButton.setOnClickListener(view -> {
             addFoodOrder();
         });
+
+        binding.gameNightMessageButton.setOnClickListener(view -> {
+            retrieveUsersAndSendMessage();
+        });
+
+        binding.gameNightCancelButton.setOnClickListener(view -> {
+            Intent intent = new Intent(this, GroupActivity.class);
+            intent.putExtra("playgroupID", this.gameNightData.getString("PlaygroupID"));
+            intent.putExtra("groupName", this.gameNightData.getString("PlaygroupName"));
+
+            startActivity(intent);
+        });
+
+        binding.gameNightDeleteGameNightButton.setOnClickListener(view -> {
+            startDeleteGameNightDialog();
+        });
+    }
+
+    private void startDeleteGameNightDialog() {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            dialogBuilder.setMessage("Möchten sie diesen Spieleabend wirklich löschen?");
+            dialogBuilder.setCancelable(true);
+
+            dialogBuilder.setPositiveButton("Ja", (dialog, id) -> {
+                dialog.cancel();
+                deleteGameNight();
+
+                Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
+                startActivity(dashboardActivityIntent);
+            });
+
+            dialogBuilder.setNegativeButton("Nein", (dialog, id) -> {
+                dialog.cancel();
+            });
+
+            dialogBuilder.create().show();
+    }
+
+    private void deleteGameNight() {
+        Runnable runnable = () -> {
+            DocumentReference gameNightRef = database.collection("GameNight").document(this.gameNightID);
+            gameNightRef.delete().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "Successfully deleted GameNight with ID: " + this.gameNightID);
+                } else {
+                    Log.d(TAG, "Failed to delete GameNight with ID: " + this.gameNightID);
+                }
+            });
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+
+    private void retrieveUsersAndSendMessage() {
+        List<String> participants = (List<String>) (this.gameNightData.get("Participants"));
+        Query possibleHostsQuery = database.collection("User").whereIn(FieldPath.documentId(), participants);
+
+        possibleHostsQuery.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "Successfully retrieved Host data.");
+                if(task.getResult().isEmpty()) {
+                    Log.d(TAG, "No Host data found.");
+                } else {
+                    Log.d(TAG, "Found Host data.");
+                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                    List<User> users = new ArrayList<>();
+
+                    for(DocumentSnapshot snapshot : documentSnapshots) {
+                        String firstName = snapshot.getString("FirstName");
+                        String lastName = snapshot.getString("LastName");
+                        String houseNumber = snapshot.getString("HouseNumber");
+                        String postalCode = snapshot.getString("PostalCode");
+                        String street = snapshot.getString("Street");
+                        String town = snapshot.getString("Town");
+                        String eMail = snapshot.getString("Email");
+                        String userID = snapshot.getId();
+
+                        users.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, userID));
+                    }
+
+                    sendMessage(users);
+                }
+            } else {
+                Log.d(TAG, "Failed to retrieve Host Data from User collection");
+            }
+        });
+    }
+
+    private void sendMessage(List<User> users) {
+        List<String> mailAdresses = users.stream()
+                .filter(user -> !user.getUserID().equals(this.userID))
+                .map(user -> user.getEmail()).collect(Collectors.toList());
+
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL, mailAdresses.toArray(new String[0]));
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Nachricht aus deiner Spielgruppe " + this.gameNightData.get("PlaygroupName"));
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    private void determineRatingAccess(DocumentSnapshot document) {
+        if(Timestamp.now().compareTo((Timestamp) document.get("DateTime")) < 0) {
+            binding.gameNightRateButton.setOnClickListener(view -> {
+                Toast.makeText(this, "Bewertung ist erst ab Zeitpunkt des Spieleabends möglich.", Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            binding.gameNightRateButton.setOnClickListener(view -> {
+                startHostRatingDialog();
+            });
+        }
+    }
+
+    private void startHostRatingDialog() {
+        Map<String, String> ratings = new HashMap<>();
+        String[] ratingOptions = new String[]{"1", "2", "3", "4", "5", "6"};
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle("Gib dem Gastgeber eine Note");
+        dialogBuilder.setSingleChoiceItems(ratingOptions, 0, (dialogInterface, selection) -> {
+
+            ratings.put("hostRating", ratingOptions[selection]);
+            dialogInterface.cancel();
+            startFoodRatingDialog(ratings);
+
+        });
+        dialogBuilder.create().show();
+    }
+
+    private void startFoodRatingDialog(Map<String, String> ratings) {
+        String[] ratingOptions = new String[]{"1", "2", "3", "4", "5", "6"};
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle("Gib dem Essen eine Note");
+        dialogBuilder.setSingleChoiceItems(ratingOptions, 0, (dialogInterface, selection) -> {
+
+            ratings.put("foodRating", ratingOptions[selection]);
+            dialogInterface.cancel();
+            startTotalRatingDialog(ratings);
+
+        });
+        dialogBuilder.create().show();
+    }
+
+    private void startTotalRatingDialog(Map<String, String> ratings) {
+        String[] ratingOptions = new String[]{"1", "2", "3", "4", "5", "6"};
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle("Gib dem Spieleabend eine Note");
+        dialogBuilder.setSingleChoiceItems(ratingOptions, 0, (dialogInterface, selection) -> {
+
+            ratings.put("generalRating", ratingOptions[selection]);
+            dialogInterface.cancel();
+
+            insertRating(ratings);
+
+        });
+        dialogBuilder.create().show();
+    }
+
+    public void insertRating(Map<String, String> ratings) {
+        Runnable runnable = () -> {
+            Map<String, Object> ratingsData = new HashMap<>();
+
+            ratingsData.put("HostRatings." + this.userID, ratings.get("hostRating"));
+            ratingsData.put("FoodRatings." + this.userID, ratings.get("foodRating"));
+            ratingsData.put("GeneralRatings." + this.userID, ratings.get("generalRating"));
+
+            DocumentReference gameNightRef = database.collection("GameNight").document(this.gameNightID);
+            gameNightRef.update(ratingsData)
+                    .addOnSuccessListener(unused -> {
+                        Log.d(TAG, "Sucessfully inserted ratings of User : "
+                                + this.userID
+                                + " into gameNight document: "
+                                + this.gameNightID);
+                        Toast.makeText(this, "Bewertungen hinzugefügt.", Toast.LENGTH_SHORT).show();
+                        updateRatingsView();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.d(TAG, "Failed to inserted ratings of User : "
+                                + this.userID
+                                + " into gameNight document: "
+                                + this.gameNightID, e);
+                        Toast.makeText(this, "Fehler beim hinzufügen der Bewertungen.", Toast.LENGTH_SHORT).show();
+                    });
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+    private void updateRatingsView() {
+        DocumentReference gameNightRef = database.collection("GameNight").document(gameNightID);
+        gameNightRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "Sucessfully retrieved gameNight document: " + gameNightID);
+                if (task.getResult().exists()) {
+
+                    this.gameNightData = task.getResult();
+                    getRatings(task.getResult());
+
+                } else {
+                    Log.d(TAG, "Could´t find gameNight document with documentID: " + gameNightID);
+                }
+            } else {
+                Log.d(TAG, "Failed to retrieved gameNight document: " + gameNightID);
+            }
+        });
     }
 
     private void addFoodOrder() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle("Für wen ist die Bestellung?");
         dialogBuilder.setItems(this.participantNames.toArray(new String[0]), (dialogInterface, selection) -> {
-            String selectedUser = participants.get(selection).getUserID();
+            String selectedUser = usersOfGameNight.get(selection).getUserID();
 
             startFoodOrderDialog(selectedUser);
         });
@@ -170,7 +383,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                     this.gameNightData = task.getResult();
 
                     getFoodOrders();
-                    createFoodOrderItems(this.participants);
+                    createFoodOrderItems(this.usersOfGameNight);
 
                 } else {
                     Log.d(TAG, "Could´t find gameNight document with documentID: " + gameNightID);
@@ -222,16 +435,19 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
             TextView participant = item.findViewById(R.id.view_item_name);
             TextView order = item.findViewById(R.id.view_item_orderDetails);
 
+            //Match user to determine name of user
             User matchingUser = users.stream().filter(user -> user.getUserID().equals(entry.getKey())).findFirst().orElse(null);
 
             if(matchingUser != null) {
-                Log.d(TAG, "Found matching user for given food Order: " + matchingUser.getUserID());
+                Log.d(TAG, "Found matching user for given food Order. UserID: " + matchingUser.getUserID());
 
                 String firstAndLastName = matchingUser.getFirstName() + " " + matchingUser.getLastName();
                 participant.setText(firstAndLastName);
                 order.setText(entry.getValue());
 
                 container.addView(item);
+            } else {
+                Log.e(TAG, "Could´t find matching user for given food Order. UserID: " + matchingUser.getUserID());
             }
         }
     }
@@ -475,15 +691,15 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
         dialogBuilder.setItems(this.participantNames.toArray(new String[0]), (dialogInterface, selection) -> {
             Runnable runnable = () -> {
                 //update view
-                String hostName =  this.participants.get(selection).getFirstName()
+                String hostName =  this.usersOfGameNight.get(selection).getFirstName()
                         + " "
-                        + this.participants.get(selection).getLastName();
-                String streetAndHouseNumber = this.participants.get(selection).getStreet()
+                        + this.usersOfGameNight.get(selection).getLastName();
+                String streetAndHouseNumber = this.usersOfGameNight.get(selection).getStreet()
                         + " "
-                        + this.participants.get(selection).getHouseNumber();
-                String townAndPostalCode =  this.participants.get(selection).getPostalCode()
+                        + this.usersOfGameNight.get(selection).getHouseNumber();
+                String townAndPostalCode =  this.usersOfGameNight.get(selection).getPostalCode()
                         + " "
-                        + this.participants.get(selection).getTown();
+                        + this.usersOfGameNight.get(selection).getTown();
 
                 binding.gameNightHostNameValue.setText(hostName);
                 binding.gameNightHostStreetHousnumberValue.setText(streetAndHouseNumber);
@@ -491,7 +707,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
 
                 //update db
                 Map<String, Object> hostData = new HashMap<>();
-                User chosenHost = this.participants.get(selection);
+                User chosenHost = this.usersOfGameNight.get(selection);
 
                 hostData.put("FirstName", chosenHost.getFirstName());
                 hostData.put("LastName", chosenHost.getLastName());
@@ -540,7 +756,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                         String userID = snapshot.getId();
 
                         this.participantNames.add(firstName + " " + lastName);
-                        this.participants.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, userID));
+                        this.usersOfGameNight.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, userID));
                     }
                 }
             } else {
@@ -568,6 +784,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                         getDeliveryServiceData();
                         getFoodOrders();
                         retrieveUsersAndCreateFoodOrderItems();
+                        determineRatingAccess(task.getResult());
                     } else {
                         Log.d(TAG, "Could´t find gameNight document with documentID: " + gameNightID);
                     }
@@ -635,27 +852,27 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
     private void getRatings(DocumentSnapshot gameNightData) {
         if(gameNightData.exists()) {
             //HostRating
-            Map<String, Long> hostRatings = (Map<String, Long>) gameNightData.get("HostRatings");
-            String userHostRating = hostRatings.get(userID) == null ? "offen" : String.valueOf(hostRatings.get(userID));
+            Map<String, String> hostRatings = (Map<String, String>) gameNightData.get("HostRatings");
+            String userHostRating = hostRatings.get(userID) == null ? "offen" : hostRatings.get(userID);
             binding.gameNightRatingsHostMyRating.setText(userHostRating);
 
-            Double averageHostRating = hostRatings.values().stream().collect(Collectors.averagingInt(value -> value.intValue()));
+            Double averageHostRating = hostRatings.values().stream().collect(Collectors.averagingInt(value -> Integer.valueOf(value)));
             binding.gameNightRatingsHostTotal.setText(String.valueOf(averageHostRating));
 
             //FoodRating
-            Map<String, Long> footRatings = (Map<String, Long>) gameNightData.get("FoodRatings");
-            String userFoodRating = footRatings.get(userID) == null ? "offen" : String.valueOf(footRatings.get(userID));
+            Map<String, String> footRatings = (Map<String, String>) gameNightData.get("FoodRatings");
+            String userFoodRating = footRatings.get(userID) == null ? "offen" : footRatings.get(userID);
             binding.gameNightRatingsFoodMyRating.setText(userFoodRating);
 
-            Double averageFootRatings = footRatings.values().stream().collect(Collectors.averagingInt(value -> value.intValue()));
+            Double averageFootRatings = footRatings.values().stream().collect(Collectors.averagingInt(value -> Integer.valueOf(value)));
             binding.gameNightRatingsFoodTotal.setText(String.valueOf(averageFootRatings));
 
             //TotalRating
-            Map<String, Long> totalRatings = (Map<String, Long>) gameNightData.get("GeneralRatings");
-            String userTotalRating = totalRatings.get(userID) == null ? "offen" : String.valueOf(totalRatings.get(userID));
+            Map<String, String> totalRatings = (Map<String, String>) gameNightData.get("GeneralRatings");
+            String userTotalRating = totalRatings.get(userID) == null ? "offen" : totalRatings.get(userID);
             binding.gameNightRatingsTotalMyRating.setText(userTotalRating);
 
-            Double averageTotalRating = totalRatings.values().stream().collect(Collectors.averagingInt(value -> value.intValue()));
+            Double averageTotalRating = totalRatings.values().stream().collect(Collectors.averagingInt(value -> Integer.valueOf(value)));
             binding.gameNightRatingsTotalTotal.setText(String.valueOf(averageTotalRating));
 
         } else {

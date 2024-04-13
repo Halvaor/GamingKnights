@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -83,7 +84,6 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
         binding.createGameNightValueHost.setOnClickListener(view -> {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
             dialogBuilder.setTitle("Gastgeber auswählen");
-
             dialogBuilder.setItems(hostNames.toArray(new String[0]), (dialogInterface, selection) -> {
                         binding.createGameNightValueHost.setText(hostNames.get(selection));
                         this.chosenHost = potentialHosts.get(selection);
@@ -127,13 +127,39 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
             database.collection("GameNight").document(gameNightID.getId()).set(gameNightData)
                     .addOnSuccessListener(aVoid -> {
                         Log.d(TAG, "Successfully inserted gameNight " + gameNightID.getId() + " into database");
+                        Toast.makeText(this, "Spieleabend wurde erfolgreich angelegt.", Toast.LENGTH_SHORT).show();
+
+                        updateLastTimeHosting(gameNightData);
+
+                        Intent intent = new Intent(this, GameNightActivity.class);
+                        intent.putExtra("gameNightID", gameNightID.getId());
+                        startActivity(intent);
                     })
                     .addOnFailureListener(e -> {
-                            Log.d(TAG, "Failed to inserted gameNight " + gameNightID.getId() + " into database", e);
+                        Log.d(TAG, "Failed to inserted gameNight " + gameNightID.getId() + " into database", e);
+                        Toast.makeText(this, "Spieleabend konnte nicht angelegt werden.", Toast.LENGTH_SHORT).show();
                     });
 
-            //ToDo es muss noch ein Intent erzeugt werden, der auf die neue GameNight Activity führt.
+
         }
+    }
+
+    private void updateLastTimeHosting(Map<String, Object> gameNightData) {
+        Map<String, Object> lastTimeHosting = new HashMap<>();
+        lastTimeHosting.put("LastTimeHosting", gameNightData.get("DateTime"));
+
+        DocumentReference hostRef = database.collection("Playgroup")
+                .document(this.playgroupID)
+                .collection("Host")
+                .document(String.valueOf(((Map<String, Object>) gameNightData.get("Host")).get("UserID")));
+
+        hostRef.update(lastTimeHosting)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Successfully updated lastTimeHosting in  " + this.playgroupID);
+                })
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "Failed to updated lastTimeHosting in  " + this.playgroupID, e);
+                });
     }
 
     @NonNull
@@ -188,11 +214,11 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
                 if(task.getResult().isEmpty()) {
                     Log.d(TAG, "Collection \"Host\" is empty");
                 } else {
+                    String nextHostID = task.getResult().getDocuments().get(0).getId();
                     List<String> hostIDs = new ArrayList<>();
+
                     task.getResult().getDocuments().stream().forEach(documentSnapshot -> hostIDs.add(documentSnapshot.getId()));
-
-                    retrieveUserData(hostIDs);
-
+                    retrieveUserDataOfPotentialHosts(hostIDs, nextHostID);
                 }
             } else {
                 Log.d(TAG, "Failed to determined host");
@@ -200,7 +226,7 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
         });
     }
 
-    private void retrieveUserData(List<String> hostIDs) {
+    private void retrieveUserDataOfPotentialHosts(List<String> hostIDs, String nextHostID) {
         Query possibleHostsQuery = database.collection("User").whereIn(FieldPath.documentId(), hostIDs);
 
         possibleHostsQuery.get().addOnCompleteListener(task -> {
@@ -226,13 +252,19 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
                         this.potentialHosts.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, userID));
                     }
 
-                   this.chosenHost = potentialHosts.get(0);
-                   binding.createGameNightValueHost.setText(chosenHost.getFirstName() + " " + chosenHost.getLastName());
+                    setNextHost(nextHostID);
                 }
             } else {
                 Log.d(TAG, "Failed to retrieve Host Data from User collection");
             }
         });
+    }
+
+    private void setNextHost(String nextHostID) {
+        this.chosenHost = potentialHosts.stream().filter(user -> user.getUserID().equals(nextHostID)).findFirst().orElse(null);
+        if(this.chosenHost != null) {
+            binding.createGameNightValueHost.setText(chosenHost.getFirstName() + " " + chosenHost.getLastName());
+        }
     }
 
     @Override

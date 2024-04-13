@@ -63,130 +63,141 @@ public class DashboardActivity extends Activity {
             if(this.nextGameNightID.isEmpty()) {
                 Toast.makeText(this, "Keinen anstehenden Spieleabend gefunden", Toast.LENGTH_SHORT).show();
             } else {
-                Intent gameNightActivity = new Intent(this, GameNightActivity.class);
-                gameNightActivity.putExtra("gameNightID", this.nextGameNightID);
-                startActivity(gameNightActivity);
+                Intent gameNightActivityIntent = new Intent(this, GameNightActivity.class);
+                gameNightActivityIntent.putExtra("gameNightID", this.nextGameNightID);
+                startActivity(gameNightActivityIntent);
             }
-            //ToDo zunächst nur testweise implementiert; Muss noch auf die richtige GameNight verweisen
         });
     }
 
     private void initAndFillScrollView(ActivityDashboardBinding binding) {
-        CollectionReference playgroupRef = database.collection("Playgroup");
-        Query query = playgroupRef.where(Filter.arrayContains("Members", userID.getId()));
+        Runnable runnable = () -> {
+            CollectionReference playgroupRef = database.collection("Playgroup");
+            Query query = playgroupRef.where(Filter.arrayContains("Members", userID.getId()));
 
-        query.get().addOnCompleteListener(task -> {
+            query.get().addOnCompleteListener(task -> {
 
-            if (task.isSuccessful()) {
-                QuerySnapshot result = task.getResult();
+                if (task.isSuccessful()) {
+                    QuerySnapshot result = task.getResult();
 
-                if(result.isEmpty()) {
-                    Log.d(TAG, "Could not find Playgroups. UserID: " + userID.getId());
+                    if (result.isEmpty()) {
+                        Log.d(TAG, "Could not find Playgroups. UserID: " + userID.getId());
 
-                } else {
-                    LinearLayout container = binding.dashboardYourGroupsScrollViewContainer;
+                    } else {
+                        LinearLayout container = binding.dashboardYourGroupsScrollViewContainer;
 
-                    for(QueryDocumentSnapshot document : result) {
-                        LinearLayout item = (LinearLayout) getLayoutInflater().inflate(R.layout.view_item, null);
-                        TextView textView = item.findViewById(R.id.view_item);
-                        String groupName = document.getString("Name");
-                        String playgroupID = document.getId();
+                        for (QueryDocumentSnapshot document : result) {
+                            LinearLayout item = (LinearLayout) getLayoutInflater().inflate(R.layout.view_item, null);
+                            TextView textView = item.findViewById(R.id.view_item);
+                            String groupName = document.getString("Name");
+                            String playgroupID = document.getId();
 
-                        textView.setText(groupName);
+                            textView.setText(groupName);
 
-                        item.setOnClickListener(view -> {
-                            Intent groupActivityIntent = new Intent(this, GroupActivity.class);
-                            groupActivityIntent.putExtra("playgroupID", playgroupID);
-                            groupActivityIntent.putExtra("groupName", groupName);
-                            startActivity(groupActivityIntent);
-                        });
+                            item.setOnClickListener(view -> {
+                                Intent groupActivityIntent = new Intent(this, GroupActivity.class);
+                                groupActivityIntent.putExtra("playgroupID", playgroupID);
+                                groupActivityIntent.putExtra("groupName", groupName);
+                                startActivity(groupActivityIntent);
+                            });
 
-                        container.addView(item);
+                            container.addView(item);
+                        }
+
                     }
-
+                } else {
+                    Log.d(TAG, "Failed to retrieve Data for next GameNight. ", task.getException());
                 }
-            } else {
-                Log.d(TAG, "Failed to retrieve Data for next GameNight. ", task.getException());
-            }
-        });
+            });
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
     }
 
     private void getNextGameNightAndFillDashboard(ActivityDashboardBinding binding) {
-        CollectionReference gameNightRef = database.collection("GameNight");
-        Query query = gameNightRef.whereArrayContains("Participants", userID.getId())
-                        .whereGreaterThan("DateTime", Timestamp.now())
-                                .orderBy("DateTime", Query.Direction.ASCENDING);
+        Runnable runnable = () -> {
+            CollectionReference gameNightRef = database.collection("GameNight");
+            Query query = gameNightRef.whereArrayContains("Participants", userID.getId())
+                    .whereGreaterThan("DateTime", Timestamp.now())
+                    .orderBy("DateTime", Query.Direction.ASCENDING);
 
-        query.get().addOnCompleteListener(task -> {
+            query.get().addOnCompleteListener(task -> {
 
-            if (task.isSuccessful()) {
-                QuerySnapshot result = task.getResult();
+                if (task.isSuccessful()) {
+                    QuerySnapshot result = task.getResult();
 
-                if(result.isEmpty()) {
-                    Log.d(TAG, "Could not find next GameNight. UserID: " + userID.getId());
-                } else {
-                    this.nextGameNightID = result.getDocuments().get(0).getId();
-
-                    binding.dashboardCardPlaygroupValue.setText(result.getDocuments().get(0).getString("PlaygroupName"));
-
-                    Date date = result.getDocuments().get(0).getTimestamp("DateTime").toDate();
-                    binding.dashboardCardDateTimeValue.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(date));
-
-                    Map<String, Object> hostData = (Map<String, Object>) result.getDocuments().get(0).get("Host");
-                    binding.dashboardCardHostValue.setText(hostData.get("FirstName") + " " + hostData.get("LastName"));
-
-                    String hostAdress = hostData.get("Street") + " " + hostData.get("HouseNumber") + ", \n" + hostData.get("PostalCode") + " " + hostData.get("Town");
-                    binding.dashboardCardAdressValue.setText(hostAdress);
-
-                    //determin if there are votes left open to be done
-                    //ToDo muss wohl noch verfeinert werden, damit auch foodOrder mit einbezogen werden 
-
-                    Optional<Object> userVote_foodType = Optional.empty();
-                    Map<String, Object> foodTypeVotes = (Map<String, Object>) (result.getDocuments().get(0).get("FoodTypeVotes"));
-                    if(foodTypeVotes != null) {
-                        userVote_foodType = Optional.ofNullable(foodTypeVotes.get(userID.getId()));
-                    }
-
-                    Optional<Object> userVote_gameSuggestion = Optional.empty();
-                    Map<String, Object> gameSuggestionVotes = (Map<String, Object>) result.getDocuments().get(0).get("GameSuggestionVotes");
-                    if(gameSuggestionVotes != null) {
-                        userVote_gameSuggestion = Optional.ofNullable(gameSuggestionVotes.get(userID.getId()));
-                    }
-
-                    if(userVote_foodType.isPresent() && userVote_gameSuggestion.isPresent()) {
-                        binding.dashboardCardTableReminderValue.setText("Erledigt");
-                        binding.dashboardCardTableReminderValue.setTextColor(getResources().getColor(R.color.green, getTheme()));
+                    if (result.isEmpty()) {
+                        Log.d(TAG, "Could not find next GameNight. UserID: " + userID.getId());
                     } else {
-                        binding.dashboardCardTableReminderValue.setText("Offen");
-                        binding.dashboardCardTableReminderValue.setTextColor(getResources().getColor(R.color.lightRed, getTheme()));
-                    }
+                        this.nextGameNightID = result.getDocuments().get(0).getId();
 
-                    //toDo Intent zur entspr. GameNight muss noch eingefürgt werden, sobald diese Activity existiert.
+                        binding.dashboardCardPlaygroupValue.setText(result.getDocuments().get(0).getString("PlaygroupName"));
+
+                        Date date = result.getDocuments().get(0).getTimestamp("DateTime").toDate();
+                        binding.dashboardCardDateTimeValue.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(date));
+
+                        Map<String, Object> hostData = (Map<String, Object>) result.getDocuments().get(0).get("Host");
+                        binding.dashboardCardHostValue.setText(hostData.get("FirstName") + " " + hostData.get("LastName"));
+
+                        String hostAdress = hostData.get("Street") + " " + hostData.get("HouseNumber") + ", \n" + hostData.get("PostalCode") + " " + hostData.get("Town");
+                        binding.dashboardCardAdressValue.setText(hostAdress);
+
+                        //determin if there are votes left open to be done
+                        //ToDo muss wohl noch verfeinert werden, damit auch foodOrder mit einbezogen werden
+
+                        Optional<Object> userVote_foodType = Optional.empty();
+                        Map<String, Object> foodTypeVotes = (Map<String, Object>) (result.getDocuments().get(0).get("FoodTypeVotes"));
+                        if (foodTypeVotes != null) {
+                            userVote_foodType = Optional.ofNullable(foodTypeVotes.get(userID.getId()));
+                        }
+
+                        Optional<Object> userVote_gameSuggestion = Optional.empty();
+                        Map<String, Object> gameSuggestionVotes = (Map<String, Object>) result.getDocuments().get(0).get("GameSuggestionVotes");
+                        if (gameSuggestionVotes != null) {
+                            userVote_gameSuggestion = Optional.ofNullable(gameSuggestionVotes.get(userID.getId()));
+                        }
+
+                        if (userVote_foodType.isPresent() && userVote_gameSuggestion.isPresent()) {
+                            binding.dashboardCardTableReminderValue.setText("Erledigt");
+                            binding.dashboardCardTableReminderValue.setTextColor(getResources().getColor(R.color.green, getTheme()));
+                        } else {
+                            binding.dashboardCardTableReminderValue.setText("Offen");
+                            binding.dashboardCardTableReminderValue.setTextColor(getResources().getColor(R.color.lightRed, getTheme()));
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "Failed to retrieve Data for next GameNight. ", task.getException());
                 }
-            } else {
-                Log.d(TAG, "Failed to retrieve Data for next GameNight. ", task.getException());
-            }
-        });
+            });
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
     }
 
 
     private void retrieveAndSetToolbarData(ActivityDashboardBinding binding) {
-        DocumentReference userRef = database.collection("User").document(userID.getId());
-        userRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Log.d(TAG, "User data: " + document.getData());
-                    String firstname = String.valueOf(document.get("FirstName"));
-                    String lastname = String.valueOf(document.get("LastName"));
-                    binding.dashboardToolbarNameView.setText(firstname + " " + lastname + " ");
+        Runnable runnable = () -> {
+
+            DocumentReference userRef = database.collection("User").document(userID.getId());
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "User data: " + document.getData());
+                        String firstname = String.valueOf(document.get("FirstName"));
+                        String lastname = String.valueOf(document.get("LastName"));
+                        binding.dashboardToolbarNameView.setText(firstname + " " + lastname + " ");
+                    } else {
+                        Log.d(TAG, "No such document in collection \"User\" : " + userID.getId());
+                    }
                 } else {
-                    Log.d(TAG, "No such document in collection \"User\" : " + userID.getId());
+                    Log.d(TAG, "Failed to retrieve User ", task.getException());
                 }
-            } else {
-                Log.d(TAG, "Failed to retrieve User ", task.getException());
-            }
-        });
+            });
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
     }
 
 }
