@@ -1,7 +1,14 @@
 package com.halvaor.gamingknights.activities;
 
+import static android.provider.Settings.System.getString;
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -12,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.firebase.Timestamp;
@@ -79,8 +87,8 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
         this.gameSuggestions = new ArrayList<>();
         this.foodTypes = new ArrayList<>();
         this.foodOrders = new HashMap<>();
-        userID = new UserID(auth.getUid()).getId();
-        gameNightID = getIntent().getStringExtra("gameNightID");
+        this.userID = new UserID(auth.getUid()).getId();
+        this.gameNightID = getIntent().getStringExtra("gameNightID");
         this.binding = ActivityGameNightBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         initGameNightView();
@@ -188,9 +196,9 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                         String street = snapshot.getString("Street");
                         String town = snapshot.getString("Town");
                         String eMail = snapshot.getString("Email");
-                        String userID = snapshot.getId();
+                        String id = snapshot.getId();
 
-                        users.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, userID));
+                        users.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, id));
                     }
 
                     sendMessage(users);
@@ -415,9 +423,9 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                         String street = snapshot.getString("Street");
                         String town = snapshot.getString("Town");
                         String eMail = snapshot.getString("Email");
-                        String userID = snapshot.getId();
+                        String id = snapshot.getId();
 
-                        users.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, userID));
+                        users.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, id));
                     }
 
                     createFoodOrderItems(users);
@@ -768,10 +776,10 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
     private void initGameNightView() {
         Runnable runnable = () -> {
 
-            DocumentReference gameNightRef = database.collection("GameNight").document(gameNightID);
+            DocumentReference gameNightRef = database.collection("GameNight").document(this.gameNightID);
             gameNightRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Log.d(TAG, "Sucessfully retrieved gameNight document: " + gameNightID);
+                    Log.d(TAG, "Sucessfully retrieved gameNight document: " + this.gameNightID);
                     if (task.getResult().exists()) {
                         this.gameNightData = task.getResult();
                         retrieveUserData();
@@ -786,10 +794,10 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                         retrieveUsersAndCreateFoodOrderItems();
                         determineRatingAccess(task.getResult());
                     } else {
-                        Log.d(TAG, "Could´t find gameNight document with documentID: " + gameNightID);
+                        Log.d(TAG, "Could´t find gameNight document with documentID: " + this.gameNightID);
                     }
                 } else {
-                    Log.d(TAG, "Failed to retrieved gameNight document: " + gameNightID);
+                    Log.d(TAG, "Failed to retrieved gameNight document: " + this.gameNightID);
                 }
             });
         };

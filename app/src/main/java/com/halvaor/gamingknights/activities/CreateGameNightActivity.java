@@ -264,6 +264,7 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
         this.chosenHost = potentialHosts.stream().filter(user -> user.getUserID().equals(nextHostID)).findFirst().orElse(null);
         if(this.chosenHost != null) {
             binding.createGameNightValueHost.setText(chosenHost.getFirstName() + " " + chosenHost.getLastName());
+            Toast.makeText(this, "Nächster Gastgeber wurde erfolgreich bestimmt.", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -622,7 +622,7 @@
                         android:layout_marginBottom="20sp"
                         android:background="@drawable/buttton"
                         android:gravity="center"
-                        android:text="Hinzufügen"
+                        android:text="Hinzufügen/ Ändern"
                         android:textColor="@color/white"
                         android:textSize="13sp"/>
                 </LinearLayout>
@@ -666,7 +666,7 @@
                     android:layout_marginTop="20sp"
                     android:layout_weight="1"
                     android:background="@drawable/buttton"
-                    android:text="Abbrechen"
+                    android:text="Zurück"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
                 <Button

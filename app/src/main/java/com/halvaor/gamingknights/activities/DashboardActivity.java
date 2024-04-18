@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +20,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityDashboardBinding;
 import com.halvaor.gamingknights.domain.id.UserID;
+import com.halvaor.gamingknights.services.DeliveryServiceNotificationService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -59,14 +59,19 @@ public class DashboardActivity extends Activity {
             startActivity(profileActivityIntent);
         });
 
+        //binding.dashboardCardView.setOnClickListener(view -> {
+        //    if(this.nextGameNightID.isEmpty()) {
+        //        Toast.makeText(this, "Keinen anstehenden Spieleabend gefunden", Toast.LENGTH_SHORT).show();
+        //    } else {
+        //        Intent gameNightActivityIntent = new Intent(this, GameNightActivity.class);
+        //        gameNightActivityIntent.putExtra("gameNightID", this.nextGameNightID);
+        //        startActivity(gameNightActivityIntent);
+        //    }
+        //});
+
         binding.dashboardCardView.setOnClickListener(view -> {
-            if(this.nextGameNightID.isEmpty()) {
-                Toast.makeText(this, "Keinen anstehenden Spieleabend gefunden", Toast.LENGTH_SHORT).show();
-            } else {
-                Intent gameNightActivityIntent = new Intent(this, GameNightActivity.class);
-                gameNightActivityIntent.putExtra("gameNightID", this.nextGameNightID);
-                startActivity(gameNightActivityIntent);
-            }
+            Intent intent = new Intent(this, DeliveryServiceNotificationService.class);
+            startService(intent);
         });
     }
 
@@ -143,9 +148,6 @@ public class DashboardActivity extends Activity {
                         String hostAdress = hostData.get("Street") + " " + hostData.get("HouseNumber") + ", \n" + hostData.get("PostalCode") + " " + hostData.get("Town");
                         binding.dashboardCardAdressValue.setText(hostAdress);
 
-                        //determin if there are votes left open to be done
-                        //ToDo muss wohl noch verfeinert werden, damit auch foodOrder mit einbezogen werden
-
                         Optional<Object> userVote_foodType = Optional.empty();
                         Map<String, Object> foodTypeVotes = (Map<String, Object>) (result.getDocuments().get(0).get("FoodTypeVotes"));
                         if (foodTypeVotes != null) {
@@ -199,6 +201,8 @@ public class DashboardActivity extends Activity {
         Thread thread = new Thread(runnable);
         thread.start();
     }
+
+
 
 }
 

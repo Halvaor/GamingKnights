@@ -11,10 +11,20 @@ Dashboard:
 
 GameNight:
 - gameNightMessageButton es ist nicht sicher, dass usersOfGameNight zu diesem zeitpunkt gefüllt ist
+- beim Ändern der Hosts muss dies in der Host collection eingetragen werden ?
 
 Playgroup:
 - Wenn keine GameNights vorhanden sind (item hinzufügen mit "keine Spieleabende vorhanden")
 
 GameNight hinzufügen:
+- Es sollte angezeigt werden, dass der Host anhand seines letzten Hostings eingetragen worden ist
+
+Benachrichtigungen:
+- Benachrichtigung an Host, dass Lieferant eingetragen werden kann
+    - Message von firebase
+- Benachrichtigungen an Mitglieder, dass Lieferant eingetragen worden ist
+    - Message von firebase
+- Benachrichtigungen an Mitglieder ihre lieblings essensrichtiung zu wählen (oder grundsätzliche Abstimmungen zu machen)
+    - TimeBased Message
 
 

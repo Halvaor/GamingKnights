@@ -208,7 +208,7 @@
 
         android:layout_marginBottom="20dp"
         android:background="@drawable/buttton"
-        android:text="Abbrechen"
+        android:text="Zurück"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/editGroup_footer"

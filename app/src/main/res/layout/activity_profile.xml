@@ -247,7 +247,7 @@
 
 
             android:background="@drawable/buttton"
-            android:text="Abbrechen"
+            android:text="Zurück"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
