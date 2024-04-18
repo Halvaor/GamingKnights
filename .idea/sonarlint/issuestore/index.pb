@@ -52,3 +52,5 @@ l
 <app/src/main/java/com/halvaor/gamingknights/domain/User.java,d/6/d6a38b3b4ffa9fbf5e11630fd64f1a2516af8dc9
 _
 /app/src/main/res/layout/activity_game_night.xml,4/1/41645a45555a1a6c94ddc24e6cbdd5d968231b97
+Œ
+\app/src/main/java/com/halvaor/gamingknights/services/DeliveryServiceNotificationService.java,f/a/fa86a11c2400a7ab3ec0feb8054fe0752cb95cc7
