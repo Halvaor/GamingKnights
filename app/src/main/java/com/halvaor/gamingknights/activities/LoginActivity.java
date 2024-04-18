@@ -9,7 +9,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.halvaor.gamingknights.R;
-import com.halvaor.gamingknights.IDs.UserID;
+import com.halvaor.gamingknights.domain.id.UserID;
 import com.halvaor.gamingknights.databinding.ActivityLoginBinding;
 
 import java.util.Optional;

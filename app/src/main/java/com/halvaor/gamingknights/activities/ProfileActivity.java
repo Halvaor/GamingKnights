@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.halvaor.gamingknights.IDs.UserID;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.halvaor.gamingknights.databinding.ActivityProfileBinding;
+import com.halvaor.gamingknights.domain.id.UserID;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +61,7 @@ public class ProfileActivity extends Activity {
     }
 
     private void fetchUserData(ActivityProfileBinding binding) {
-        DocumentReference userRef = database.collection("User").document(userID.getId());
+        DocumentReference userRef = database.collection("User").document(this.userID.getId());
         userRef.get().addOnCompleteListener(task -> {
             if(task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -73,7 +76,7 @@ public class ProfileActivity extends Activity {
                     binding.profilePostalcodeValue.setText(document.getString("PostalCode"));
                     binding.profileEMailValue.setText(document.getString("Email"));
                 } else {
-                    Log.d(TAG, "No such document in collection \"User\" : " + userID.getId());
+                    Log.d(TAG, "No such document in collection \"User\" : " + this.userID.getId());
                 }
             } else {
                 Log.d(TAG, "Failed to retrieve User ", task.getException());
@@ -82,15 +85,60 @@ public class ProfileActivity extends Activity {
     }
 
     private void updateProfile(Map<String, Object> updateInformation) {
-        DocumentReference userRef = database.collection("User").document(userID.getId());
-        userRef.update(updateInformation)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "User successfully updated!");
-        })
-                .addOnFailureListener(exception -> {
-                    Log.w(TAG, "Error updating User", exception);
-                    Toast.makeText(this, "Profiländerung fehlgeschlagen", Toast.LENGTH_SHORT).show();
-                });
+        Runnable runnable = () -> {
+            DocumentReference userRef = database.collection("User").document(this.userID.getId());
+            userRef.update(updateInformation)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "User successfully updated!");
+                        Toast.makeText(this, "Profiländerung erfolgreich", Toast.LENGTH_SHORT).show();
+                        updateProfileInUpcomingGameNights(updateInformation);
+                    })
+                    .addOnFailureListener(exception -> {
+                        Log.w(TAG, "Error updating User", exception);
+                        Toast.makeText(this, "Profiländerung fehlgeschlagen", Toast.LENGTH_SHORT).show();
+                    });
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+    private void updateProfileInUpcomingGameNights(Map<String, Object> updateInformation) {
+        Query query = database.collection("GameNight")
+                .whereGreaterThan("DateTime", Timestamp.now())
+                .whereEqualTo("Host.UserID", this.userID.getId());
+
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "Successfully fetched upcoming GameNights where Host is " + this.userID.getId());
+                if (task.getResult().isEmpty()) {
+                    Log.d(TAG, "Could not find upcoming GameNights where Host is " + this.userID.getId());
+                } else {
+                    Map<String, Object> hostData = new HashMap<>();
+
+                    hostData.put("Host.FirstName", updateInformation.get("FirstName"));
+                    hostData.put("Host.LastName", updateInformation.get("LastName"));
+                    hostData.put("Host.Street", updateInformation.get("Street"));
+                    hostData.put("Host.HouseNumber", updateInformation.get("HouseNumber"));
+                    hostData.put("Host.PostalCode", updateInformation.get("PostalCode"));
+                    hostData.put("Host.Town", updateInformation.get("Town"));
+
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        DocumentReference gameNightRef = database.collection("GameNight").document(document.getId());
+
+                        gameNightRef.update(hostData)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d(TAG, "Successfully updated HostData in GameNight: " + document.getId());
+                                })
+                                .addOnFailureListener(exception -> {
+                                    Log.e(TAG, "Failed to updated HostData in GameNight: " + document.getId(), exception);
+                                    Toast.makeText(this, "Profiländerung fehlgeschlagen", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                }
+            } else {
+                Log.d(TAG, "Failed to fetched upcoming GameNights where Host is " + this.userID.getId());
+            }
+        });
     }
 
     private Map<String, Object> fetchInput(ActivityProfileBinding binding) {

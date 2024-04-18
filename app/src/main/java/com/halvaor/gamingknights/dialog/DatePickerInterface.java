@@ -1,4 +1,4 @@
-package com.halvaor.gamingknights;
+package com.halvaor.gamingknights.dialog;
 
 import android.widget.DatePicker;
 

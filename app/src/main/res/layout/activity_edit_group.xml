@@ -156,7 +156,6 @@
     <ScrollView
         android:id="@+id/scrollView4"
         android:layout_width="match_parent"
-
         android:layout_height="163dp"
         android:background="@color/tintedBlue"
         app:layout_constraintEnd_toEndOf="parent"
@@ -209,7 +208,7 @@
 
         android:layout_marginBottom="20dp"
         android:background="@drawable/buttton"
-        android:text="Abbrechen"
+        android:text="Zurück"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/editGroup_footer"

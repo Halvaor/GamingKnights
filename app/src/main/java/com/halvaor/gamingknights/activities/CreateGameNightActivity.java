@@ -12,26 +12,28 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.halvaor.gamingknights.DatePickerFragment;
-import com.halvaor.gamingknights.DatePickerInterface;
-import com.halvaor.gamingknights.IDs.GameNightID;
-import com.halvaor.gamingknights.TimePickerFragment;
-import com.halvaor.gamingknights.TimePickerInterface;
-import com.halvaor.gamingknights.User;
 import com.halvaor.gamingknights.databinding.ActivityCreateGamenightBinding;
+import com.halvaor.gamingknights.dialog.DatePickerFragment;
+import com.halvaor.gamingknights.dialog.DatePickerInterface;
+import com.halvaor.gamingknights.dialog.TimePickerFragment;
+import com.halvaor.gamingknights.dialog.TimePickerInterface;
+import com.halvaor.gamingknights.domain.User;
+import com.halvaor.gamingknights.domain.id.GameNightID;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,7 +84,6 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
         binding.createGameNightValueHost.setOnClickListener(view -> {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
             dialogBuilder.setTitle("Gastgeber auswählen");
-
             dialogBuilder.setItems(hostNames.toArray(new String[0]), (dialogInterface, selection) -> {
                         binding.createGameNightValueHost.setText(hostNames.get(selection));
                         this.chosenHost = potentialHosts.get(selection);
@@ -126,18 +127,45 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
             database.collection("GameNight").document(gameNightID.getId()).set(gameNightData)
                     .addOnSuccessListener(aVoid -> {
                         Log.d(TAG, "Successfully inserted gameNight " + gameNightID.getId() + " into database");
+                        Toast.makeText(this, "Spieleabend wurde erfolgreich angelegt.", Toast.LENGTH_SHORT).show();
+
+                        updateLastTimeHosting(gameNightData);
+
+                        Intent intent = new Intent(this, GameNightActivity.class);
+                        intent.putExtra("gameNightID", gameNightID.getId());
+                        startActivity(intent);
                     })
                     .addOnFailureListener(e -> {
-                            Log.d(TAG, "Failed to inserted gameNight " + gameNightID.getId() + " into database", e);
+                        Log.d(TAG, "Failed to inserted gameNight " + gameNightID.getId() + " into database", e);
+                        Toast.makeText(this, "Spieleabend konnte nicht angelegt werden.", Toast.LENGTH_SHORT).show();
                     });
 
-            //Todo es muss noch ein Intent erzeugt werden, der auf die neue GameNight Activity führt.
+
         }
+    }
+
+    private void updateLastTimeHosting(Map<String, Object> gameNightData) {
+        Map<String, Object> lastTimeHosting = new HashMap<>();
+        lastTimeHosting.put("LastTimeHosting", gameNightData.get("DateTime"));
+
+        DocumentReference hostRef = database.collection("Playgroup")
+                .document(this.playgroupID)
+                .collection("Host")
+                .document(String.valueOf(((Map<String, Object>) gameNightData.get("Host")).get("UserID")));
+
+        hostRef.update(lastTimeHosting)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Successfully updated lastTimeHosting in  " + this.playgroupID);
+                })
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "Failed to updated lastTimeHosting in  " + this.playgroupID, e);
+                });
     }
 
     @NonNull
     private Map<String, Object> buildGameNightData() {
-        LocalDateTime localDateTime = LocalDateTime.of(this.year, this.month, this.day, this.hour, this.minute);
+        //month +1 because LocalDateTime counts months from 1-12 while Calender, etc. counts from 0-11.
+        LocalDateTime localDateTime = LocalDateTime.of(this.year, this.month +1, this.day, this.hour, this.minute);
         Instant gameNightInstant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
 
         Map<String, Object> gameNightData = new HashMap<>();
@@ -186,11 +214,11 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
                 if(task.getResult().isEmpty()) {
                     Log.d(TAG, "Collection \"Host\" is empty");
                 } else {
+                    String nextHostID = task.getResult().getDocuments().get(0).getId();
                     List<String> hostIDs = new ArrayList<>();
+
                     task.getResult().getDocuments().stream().forEach(documentSnapshot -> hostIDs.add(documentSnapshot.getId()));
-
-                    retrieveUserData(hostIDs);
-
+                    retrieveUserDataOfPotentialHosts(hostIDs, nextHostID);
                 }
             } else {
                 Log.d(TAG, "Failed to determined host");
@@ -198,7 +226,7 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
         });
     }
 
-    private void retrieveUserData(List<String> hostIDs) {
+    private void retrieveUserDataOfPotentialHosts(List<String> hostIDs, String nextHostID) {
         Query possibleHostsQuery = database.collection("User").whereIn(FieldPath.documentId(), hostIDs);
 
         possibleHostsQuery.get().addOnCompleteListener(task -> {
@@ -224,8 +252,7 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
                         this.potentialHosts.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, userID));
                     }
 
-                   this.chosenHost = potentialHosts.get(0);
-                   binding.createGameNightValueHost.setText(chosenHost.getFirstName() + " " + chosenHost.getLastName());
+                    setNextHost(nextHostID);
                 }
             } else {
                 Log.d(TAG, "Failed to retrieve Host Data from User collection");
@@ -233,26 +260,36 @@ public class CreateGameNightActivity extends FragmentActivity implements TimePic
         });
     }
 
+    private void setNextHost(String nextHostID) {
+        this.chosenHost = potentialHosts.stream().filter(user -> user.getUserID().equals(nextHostID)).findFirst().orElse(null);
+        if(this.chosenHost != null) {
+            binding.createGameNightValueHost.setText(chosenHost.getFirstName() + " " + chosenHost.getLastName());
+            Toast.makeText(this, "Nächster Gastgeber wurde erfolgreich bestimmt.", Toast.LENGTH_LONG).show();
+        }
+    }
+
     @Override
     public void bindTime(int hour, int minute) {
+        LocalTime time = LocalTime.of(hour, minute);
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
         this.hour = hour;
         this.minute = minute;
-        binding.createGameNightValueTime.setText(hour + ":" + minute + " Uhr");
+
+        binding.createGameNightValueTime.setText(time.format(timeFormat) + " Uhr");
     }
 
     @Override
     public void bindDate(DatePicker datePicker) {
-        this.year = datePicker.getYear();
-        this.month = datePicker.getMonth();
-        this.day = datePicker.getDayOfMonth();
-
         Calendar calendar = Calendar.getInstance();
         calendar.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
 
-        String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
-        int day = datePicker.getDayOfMonth();
-        int year = datePicker.getYear();
+        this.month = calendar.get(Calendar.MONTH);
+        this.day = calendar.get(Calendar.DAY_OF_MONTH);
+        this.year = calendar.get(Calendar.YEAR);
 
-        binding.createGameNightValueDate.setText(day + "." + month + "." + year);
+        LocalDateTime date = LocalDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault());
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        binding.createGameNightValueDate.setText(date.format(dateFormat));
     }
 }
