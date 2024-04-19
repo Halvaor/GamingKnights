@@ -123,12 +123,10 @@
             android:id="@+id/createGameNight_cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_marginStart="10sp"
             android:layout_marginEnd="10sp"
             android:layout_marginBottom="10sp"
             android:layout_weight="1"
-
             android:background="@drawable/buttton"
             android:text="Abbrechen"
             android:textColor="@color/white"
@@ -138,12 +136,10 @@
             android:id="@+id/createGameNight_create_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_marginStart="10sp"
             android:layout_marginEnd="10sp"
             android:layout_marginBottom="10sp"
             android:layout_weight="1"
-
             android:background="@drawable/buttton"
             android:text="Anlegen"
             android:textColor="@color/white"

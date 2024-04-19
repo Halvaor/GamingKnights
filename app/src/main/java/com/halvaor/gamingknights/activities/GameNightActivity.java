@@ -1,14 +1,7 @@
 package com.halvaor.gamingknights.activities;
 
-import static android.provider.Settings.System.getString;
-import static androidx.core.content.ContextCompat.getSystemService;
-
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -19,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.firebase.Timestamp;
@@ -53,11 +45,10 @@ import java.util.stream.Collectors;
 
 public class GameNightActivity extends FragmentActivity implements TimePickerInterface, DatePickerInterface {
 
-    private String TAG = "GameNightActivity";
+    private static final String TAG = "GameNightActivity";
     private ActivityGameNightBinding binding;
     private FirebaseFirestore database;
     private String gameNightID;
-    private FirebaseAuth auth;
     private String userID;
     private List<String> participantNames;
     private List<User> usersOfGameNight;
@@ -69,7 +60,6 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
     private Map<String, String> foodOrders;
     private String deliveryServiceUrl = "";
     private String deliveryServiceName = "";
-
     private int hour;
     private int minute;
     private int month;
@@ -81,51 +71,54 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.database = FirebaseFirestore.getInstance();
-        this.auth = FirebaseAuth.getInstance();
         this.usersOfGameNight = new ArrayList<>();
         this.participantNames = new ArrayList<>();
         this.gameSuggestions = new ArrayList<>();
         this.foodTypes = new ArrayList<>();
         this.foodOrders = new HashMap<>();
-        this.userID = new UserID(auth.getUid()).getId();
+        this.userID = new UserID(FirebaseAuth.getInstance().getUid()).getId();
         this.gameNightID = getIntent().getStringExtra("gameNightID");
         this.binding = ActivityGameNightBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         initGameNightView();
 
-        binding.gameNightTimePlaceButton.setOnClickListener(view -> {
+        bindListeners();
+    }
+
+    private void bindListeners() {
+        this.binding.gameNightTimePlaceButton.setOnClickListener(view -> {
             updateDateTime();
         });
 
-        binding.gameNightChangeHostButton.setOnClickListener(view -> {
+        this.binding.gameNightChangeHostButton.setOnClickListener(view -> {
             changeHost();
         });
 
-        binding.gameNightGameProposalButton.setOnClickListener(view -> {
+        this.binding.gameNightGameProposalButton.setOnClickListener(view -> {
             addGameSuggestion();
         });
 
-        binding.gameNightGameVoteButton.setOnClickListener(view -> {
+        this.binding.gameNightGameVoteButton.setOnClickListener(view -> {
             addGameVoting();
         });
 
-        binding.gameNightFoodVoteButton.setOnClickListener(view -> {
+        this.binding.gameNightFoodVoteButton.setOnClickListener(view -> {
             addFoodVoting();
         });
 
-        binding.gameNightDeliveryServiceButton.setOnClickListener(view -> {
+        this.binding.gameNightDeliveryServiceButton.setOnClickListener(view -> {
             showDeliveryServiceDialog();
         });
 
-        binding.gameNightFoodOrderButton.setOnClickListener(view -> {
+        this.binding.gameNightFoodOrderButton.setOnClickListener(view -> {
             addFoodOrder();
         });
 
-        binding.gameNightMessageButton.setOnClickListener(view -> {
+        this.binding.gameNightMessageButton.setOnClickListener(view -> {
             retrieveUsersAndSendMessage();
         });
 
-        binding.gameNightCancelButton.setOnClickListener(view -> {
+        this.binding.gameNightCancelButton.setOnClickListener(view -> {
             Intent intent = new Intent(this, GroupActivity.class);
             intent.putExtra("playgroupID", this.gameNightData.getString("PlaygroupID"));
             intent.putExtra("groupName", this.gameNightData.getString("PlaygroupName"));
@@ -133,7 +126,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
             startActivity(intent);
         });
 
-        binding.gameNightDeleteGameNightButton.setOnClickListener(view -> {
+        this.binding.gameNightDeleteGameNightButton.setOnClickListener(view -> {
             startDeleteGameNightDialog();
         });
     }
@@ -176,6 +169,9 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
 
     private void retrieveUsersAndSendMessage() {
         List<String> participants = (List<String>) (this.gameNightData.get("Participants"));
+        if(participants == null) {
+            participants = new ArrayList<>();
+        }
         Query possibleHostsQuery = database.collection("User").whereIn(FieldPath.documentId(), participants);
 
         possibleHostsQuery.get().addOnCompleteListener(task -> {
@@ -227,7 +223,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
     private void determineRatingAccess(DocumentSnapshot document) {
         if(Timestamp.now().compareTo((Timestamp) document.get("DateTime")) < 0) {
             binding.gameNightRateButton.setOnClickListener(view -> {
-                Toast.makeText(this, "Bewertung ist erst ab Zeitpunkt des Spieleabends möglich.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Eine Bewertung ist erst nach dem Spieleabend möglich.", Toast.LENGTH_SHORT).show();
             });
         } else {
             binding.gameNightRateButton.setOnClickListener(view -> {
@@ -404,6 +400,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
 
     private void retrieveUsersAndCreateFoodOrderItems() {
         List<String> participants = (List<String>) (this.gameNightData.get("Participants"));
+        if(participants == null ) participants = new ArrayList<>();
         Query getUsersQuery = database.collection("User").whereIn(FieldPath.documentId(), participants);
 
         getUsersQuery.get().addOnCompleteListener(task -> {
@@ -455,7 +452,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
 
                 container.addView(item);
             } else {
-                Log.e(TAG, "Could´t find matching user for given food Order. UserID: " + matchingUser.getUserID());
+                Log.e(TAG, "Could´t find matching user for given food Order. UserID: " + entry.getKey());
             }
         }
     }
@@ -742,6 +739,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
 
     private void retrieveUserData() {
         List<String> participants = (List<String>) (this.gameNightData.get("Participants"));
+        if(participants == null) participants = new ArrayList<>();
         Query possibleHostsQuery = database.collection("User").whereIn(FieldPath.documentId(), participants);
 
         possibleHostsQuery.get().addOnCompleteListener(task -> {
@@ -761,10 +759,10 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                         String street = snapshot.getString("Street");
                         String town = snapshot.getString("Town");
                         String eMail = snapshot.getString("Email");
-                        String userID = snapshot.getId();
+                        String id = snapshot.getId();
 
                         this.participantNames.add(firstName + " " + lastName);
-                        this.usersOfGameNight.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, userID));
+                        this.usersOfGameNight.add(new User(eMail, firstName, lastName, houseNumber, postalCode, street, town, id));
                     }
                 }
             } else {
@@ -782,6 +780,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                     Log.d(TAG, "Sucessfully retrieved gameNight document: " + this.gameNightID);
                     if (task.getResult().exists()) {
                         this.gameNightData = task.getResult();
+                        getPlaygroupName(task.getResult());
                         retrieveUserData();
                         getRatings(task.getResult());
                         getDateAndTime(task.getResult());
@@ -803,6 +802,13 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
         };
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    private void getPlaygroupName(DocumentSnapshot documentSnapshot) {
+        String playgroupName = documentSnapshot.getString("PlaygroupName");
+        if(playgroupName != null && !playgroupName.isEmpty()) {
+            binding.gameNightHeaderGroupname.setText(playgroupName);
+        }
     }
 
     private void getDeliveryServiceData() {
@@ -861,7 +867,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
         if(gameNightData.exists()) {
             //HostRating
             Map<String, String> hostRatings = (Map<String, String>) gameNightData.get("HostRatings");
-            String userHostRating = hostRatings.get(userID) == null ? "offen" : hostRatings.get(userID);
+            String userHostRating = hostRatings.get(userID) == null ? "*" : hostRatings.get(userID);
             binding.gameNightRatingsHostMyRating.setText(userHostRating);
 
             Double averageHostRating = hostRatings.values().stream().collect(Collectors.averagingInt(value -> Integer.valueOf(value)));
@@ -869,7 +875,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
 
             //FoodRating
             Map<String, String> footRatings = (Map<String, String>) gameNightData.get("FoodRatings");
-            String userFoodRating = footRatings.get(userID) == null ? "offen" : footRatings.get(userID);
+            String userFoodRating = footRatings.get(userID) == null ? "*" : footRatings.get(userID);
             binding.gameNightRatingsFoodMyRating.setText(userFoodRating);
 
             Double averageFootRatings = footRatings.values().stream().collect(Collectors.averagingInt(value -> Integer.valueOf(value)));
@@ -877,7 +883,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
 
             //TotalRating
             Map<String, String> totalRatings = (Map<String, String>) gameNightData.get("GeneralRatings");
-            String userTotalRating = totalRatings.get(userID) == null ? "offen" : totalRatings.get(userID);
+            String userTotalRating = totalRatings.get(userID) == null ? "*" : totalRatings.get(userID);
             binding.gameNightRatingsTotalMyRating.setText(userTotalRating);
 
             Double averageTotalRating = totalRatings.values().stream().collect(Collectors.averagingInt(value -> Integer.valueOf(value)));
@@ -942,9 +948,9 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                             localDateTime.format(timeFormat) +
                             " Uhr");
                 })
-                .addOnFailureListener(e -> {
-                    Log.w(TAG, "Failed to update dateTime of gameNight: " + this.gameNightID, e);
-                });
+                .addOnFailureListener(e ->
+                    Log.w(TAG, "Failed to update dateTime of gameNight: " + this.gameNightID, e)
+                );
     }
 
 

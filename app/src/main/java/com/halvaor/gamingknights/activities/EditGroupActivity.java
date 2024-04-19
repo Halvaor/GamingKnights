@@ -62,7 +62,10 @@ public class EditGroupActivity extends Activity {
         this.userID = new UserID(auth.getUid());
 
         determineGroupMembers();
+        bindListeners();
+    }
 
+    private void bindListeners() {
         this.binding.editGroupCancelButton.setOnClickListener(view -> {
             Intent groupActivityIntent = new Intent(this, GroupActivity.class);
             groupActivityIntent.putExtra("playgroupID", playgroupID);
@@ -84,22 +87,21 @@ public class EditGroupActivity extends Activity {
             dialogBuilder.setCancelable(true);
 
             dialogBuilder.setPositiveButton("Ja", (dialog, id) -> {
-                        dialog.cancel();
-                        deletePlaygroup();
+                dialog.cancel();
+                deletePlaygroup();
 
-                        Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
-                        startActivity(dashboardActivityIntent);
-                    });
+                Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
+                startActivity(dashboardActivityIntent);
+            });
 
             dialogBuilder.setNegativeButton("Nein", (dialog, id) -> {
-                        dialog.cancel();
-                    });
+                dialog.cancel();
+            });
 
             AlertDialog alertDialog = dialogBuilder.create();
             alertDialog.show();
         });
     }
-
     private void deletePlaygroup() {
         Runnable runnable = () -> {
             removeMemberships();

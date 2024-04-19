@@ -14,9 +14,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.halvaor.gamingknights.domain.id.UserID;
 import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityGroupBinding;
+import com.halvaor.gamingknights.domain.id.UserID;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,6 +44,12 @@ public class GroupActivity extends Activity {
         this.groupName = getIntent().getExtras().getString("groupName");
         this.userID = new UserID(auth.getUid());
 
+        bindListeners(binding);
+        getNextGameNightAndFillDashboard(binding);
+        initAndFillScrollView(binding);
+    }
+
+    private void bindListeners(ActivityGroupBinding binding) {
         binding.groupToolbarGroupnameView.setText(groupName);
 
         binding.groupToolbarEditbutton.setOnClickListener(view -> {
@@ -64,9 +70,6 @@ public class GroupActivity extends Activity {
             createGameNightIntent.putExtra("groupName", this.groupName);
             startActivity(createGameNightIntent);
         });
-
-        getNextGameNightAndFillDashboard(binding);
-        initAndFillScrollView(binding);
     }
 
     private void getNextGameNightAndFillDashboard(ActivityGroupBinding binding) {
@@ -82,10 +85,8 @@ public class GroupActivity extends Activity {
 
                 if(result.isEmpty()) {
                     Log.d(TAG, "Could not find next GameNight. PlaygroupID: " + playgroupID);
+                    binding.groupCardHeadline.setText("Kein ausstehender Spieleabend für diese Gruppe");
                 } else {
-                    
-                    //ToDo OnClickListener muss noch gesetzt werden 
-                    
                     Date date = result.getDocuments().get(0).getTimestamp("DateTime").toDate();
                     binding.groupCardDateTimeValue.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(date));
 
@@ -96,7 +97,6 @@ public class GroupActivity extends Activity {
                     binding.groupCardAdressValue.setText(hostAdress);
 
                     //determin if there are votes left open to be done
-
                     Optional<Object> userVote_foodType = Optional.empty();
                     Map<String, Object> foodTypeVotes = (Map<String, Object>) (result.getDocuments().get(0).get("FoodTypeVotes"));
                     if(foodTypeVotes != null) {
@@ -134,16 +134,13 @@ public class GroupActivity extends Activity {
         Query query = gameNightRef.whereEqualTo("PlaygroupID", playgroupID).orderBy("DateTime", Query.Direction.DESCENDING);
 
         query.get().addOnCompleteListener(task -> {
-
             if (task.isSuccessful()) {
                 QuerySnapshot result = task.getResult();
 
                 if(result.isEmpty()) {
                     Log.d(TAG, "Could not find GameNight. PlaygroupID: " + playgroupID);
-
                 } else {
                     LinearLayout container = binding.groupGamenightsScrollViewContainer;
-
                     for(QueryDocumentSnapshot document : result) {
                         LinearLayout item = (LinearLayout) getLayoutInflater().inflate(R.layout.view_item_with_rating, null);
                         TextView dateValue = item.findViewById(R.id.view_item_with_rating);
@@ -154,11 +151,12 @@ public class GroupActivity extends Activity {
                         setHostRating(document, item);
                         setGeneralRating(document, item);
 
-                        item.setOnClickListener(view -> {
-                            Intent intent = new Intent(this, GameNightActivity.class);
-                            intent.putExtra("gameNightID", document.getId());
-                            startActivity(intent);
-                        });
+                        Timestamp gameNightDateTime = (Timestamp) document.get("DateTime");
+                        if(gameNightDateTime.compareTo(Timestamp.now()) < 0) {
+                            dateValue.setBackgroundColor(getResources().getColor(R.color.tintedBlue));
+                        }
+
+
 
                         container.addView(item);
                     }
@@ -170,11 +168,9 @@ public class GroupActivity extends Activity {
     }
 
     private void setListenerOnItem(QueryDocumentSnapshot document, LinearLayout item) {
-        String gameNightID = document.getString("GameNightID");
         item.setOnClickListener(view -> {
-            Intent gameNightActivityIntent = new Intent(this, GroupActivity.class);
-            //Todo GameNightActivity existiert noch nicth
-            gameNightActivityIntent.putExtra("GameNightID", gameNightID);
+            Intent gameNightActivityIntent = new Intent(this, GameNightActivity.class);
+            gameNightActivityIntent.putExtra("gameNightID", document.getId());
             startActivity(gameNightActivityIntent);
         });
     }
@@ -197,7 +193,7 @@ public class GroupActivity extends Activity {
             if(generalRatingUser != null) {
                 generalRatingElement.setText(generalRatingUser);
             }else {
-                generalRatingElement.setText("Offen");
+                generalRatingElement.setText("*");
                 generalRatingElement.setTextColor(getResources().getColor(R.color.lightRed));
             }
         }
@@ -212,7 +208,7 @@ public class GroupActivity extends Activity {
             if(hostRatingUser != null) {
                 hostRatingElement.setText(hostRatingUser);
             }else {
-                hostRatingElement.setText("Offen");
+                hostRatingElement.setText("*");
                 hostRatingElement.setTextColor(getResources().getColor(R.color.lightRed));
             }
         }
@@ -227,7 +223,7 @@ public class GroupActivity extends Activity {
             if(foodRatingOfUser != null) {
                 foodRatingElement.setText(foodRatingOfUser);
             }else {
-                foodRatingElement.setText("Offen");
+                foodRatingElement.setText("*");
                 foodRatingElement.setTextColor(getResources().getColor(R.color.lightRed));
             }
         }

@@ -33,12 +33,15 @@ public class ProfileActivity extends Activity {
         super.onCreate(savedInstanceState);
         ActivityProfileBinding binding = ActivityProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        auth = FirebaseAuth.getInstance();
-        database = FirebaseFirestore.getInstance();
-        userID = new UserID(auth.getUid());
+        this.auth = FirebaseAuth.getInstance();
+        this.database = FirebaseFirestore.getInstance();
+        this.userID = new UserID(auth.getUid());
 
         fetchUserData(binding);
+        bindListeners(binding);
+    }
 
+    private void bindListeners(ActivityProfileBinding binding) {
         binding.profileCancelButton.setOnClickListener(view -> {
             Intent dashboardActivityIntent = new Intent(this, DashboardActivity.class);
             startActivity(dashboardActivityIntent);
@@ -59,6 +62,7 @@ public class ProfileActivity extends Activity {
             }
         });
     }
+
 
     private void fetchUserData(ActivityProfileBinding binding) {
         DocumentReference userRef = database.collection("User").document(this.userID.getId());

@@ -12,7 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GamingKnights"
         tools:targetApi="31">
-
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true">
@@ -61,9 +60,6 @@
             android:exported="true"
             android:windowSoftInputMode="adjustPan">
         </activity>
-        <service
-            android:name=".services.DeliveryServiceNotificationService">
-        </service>
     </application>
     <queries>
         <intent>

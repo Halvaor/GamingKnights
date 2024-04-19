@@ -43,14 +43,14 @@ public class SignInActivity extends Activity {
     private Map<String, String> fetchInput() {
         Map<String, String> inputs = new HashMap<>();
 
-        inputs.put("firstname", Optional.ofNullable(binding.signInInputFirstname.getText().toString()).orElse(""));
-        inputs.put("lastname", Optional.ofNullable(binding.signInInputLastname.getText().toString()).orElse(""));
-        inputs.put("street", Optional.ofNullable(binding.signInInputStreet.getText().toString()).orElse(""));
-        inputs.put("houseNumber", Optional.ofNullable(binding.signInInputHouseNumber.getText().toString()).orElse(""));
-        inputs.put("postalCode", Optional.ofNullable(binding.signInInputPostalCode.getText().toString()).orElse(""));
-        inputs.put("town", Optional.ofNullable(binding.signInInputTown.getText().toString()).orElse(""));
-        inputs.put("email", Optional.ofNullable(binding.signInInputEmail.getText().toString()).orElse(""));
-        inputs.put("password", Optional.ofNullable(binding.signInInputPassword.getText().toString()).orElse(""));
+        inputs.put("firstname", Optional.of(binding.signInInputFirstname.getText().toString()).orElse(""));
+        inputs.put("lastname", Optional.of(binding.signInInputLastname.getText().toString()).orElse(""));
+        inputs.put("street", Optional.of(binding.signInInputStreet.getText().toString()).orElse(""));
+        inputs.put("houseNumber", Optional.of(binding.signInInputHouseNumber.getText().toString()).orElse(""));
+        inputs.put("postalCode", Optional.of(binding.signInInputPostalCode.getText().toString()).orElse(""));
+        inputs.put("town", Optional.of(binding.signInInputTown.getText().toString()).orElse(""));
+        inputs.put("email", Optional.of(binding.signInInputEmail.getText().toString()).orElse(""));
+        inputs.put("password", Optional.of(binding.signInInputPassword.getText().toString()).orElse(""));
 
         return inputs;
     }
