@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,7 +21,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.halvaor.gamingknights.R;
 import com.halvaor.gamingknights.databinding.ActivityDashboardBinding;
 import com.halvaor.gamingknights.domain.id.UserID;
-import com.halvaor.gamingknights.services.DeliveryServiceNotificationService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -49,9 +49,13 @@ public class DashboardActivity extends Activity {
         getNextGameNightAndFillDashboard(binding);
         initAndFillScrollView(binding);
 
+        bindListeners(binding);
+    }
+
+    private void bindListeners(ActivityDashboardBinding binding) {
         binding.dasboardAddGroupButton.setOnClickListener(view -> {
-                Intent newGroupActivityIntent = new Intent(this, NewGroupActivity.class);
-                startActivity(newGroupActivityIntent);
+            Intent newGroupActivityIntent = new Intent(this, NewGroupActivity.class);
+            startActivity(newGroupActivityIntent);
         });
 
         binding.dashboardToolbarEditbutton.setOnClickListener(view -> {
@@ -59,19 +63,14 @@ public class DashboardActivity extends Activity {
             startActivity(profileActivityIntent);
         });
 
-        //binding.dashboardCardView.setOnClickListener(view -> {
-        //    if(this.nextGameNightID.isEmpty()) {
-        //        Toast.makeText(this, "Keinen anstehenden Spieleabend gefunden", Toast.LENGTH_SHORT).show();
-        //    } else {
-        //        Intent gameNightActivityIntent = new Intent(this, GameNightActivity.class);
-        //        gameNightActivityIntent.putExtra("gameNightID", this.nextGameNightID);
-        //        startActivity(gameNightActivityIntent);
-        //    }
-        //});
-
         binding.dashboardCardView.setOnClickListener(view -> {
-            Intent intent = new Intent(this, DeliveryServiceNotificationService.class);
-            startService(intent);
+            if(this.nextGameNightID.isEmpty()) {
+                Toast.makeText(this, "Keinen anstehenden Spieleabend gefunden", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent gameNightActivityIntent = new Intent(this, GameNightActivity.class);
+                gameNightActivityIntent.putExtra("gameNightID", this.nextGameNightID);
+                startActivity(gameNightActivityIntent);
+            }
         });
     }
 
@@ -134,6 +133,7 @@ public class DashboardActivity extends Activity {
 
                     if (result.isEmpty()) {
                         Log.d(TAG, "Could not find next GameNight. UserID: " + userID.getId());
+                        binding.dashboardCardHeadline.setText("Kein ausstehender Spieleabend");
                     } else {
                         this.nextGameNightID = result.getDocuments().get(0).getId();
 

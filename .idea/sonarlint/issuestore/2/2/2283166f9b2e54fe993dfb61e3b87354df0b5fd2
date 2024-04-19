@@ -1,10 +1,12 @@
 
-b	java:S112D"FDefine and throw a dedicated exception instead of using a generic one.(ìùÄ¤8Åº±Àä1
+b	java:S112D"FDefine and throw a dedicated exception instead of using a generic one.(ìùÄ¤8¦ßÃ…ï1
 O
-java:S1172?"-Remove this unused method parameter "userID".(ä§§Øÿÿÿÿÿ8Óº±Àä1
+java:S1172?"-Remove this unused method parameter "userID".(ä§§Øÿÿÿÿÿ8²ßÃ…ï1
 ‰
-java:S1130D"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(ìùÄ¤8Ôº±Àä1
+java:S1130D"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(ìùÄ¤8²ßÃ…ï1
 L
-java:S1874O"0Remove this use of "getColor"; it is deprecated.(´æÄg8Õº±Àä1
+java:S1874O"0Remove this use of "getColor"; it is deprecated.(´æÄg8³ßÃ…ï1
 R
-java:S1874P"0Remove this use of "getColor"; it is deprecated.(âØûÿÿÿÿ8Õº±Àä1
+java:S1874P"0Remove this use of "getColor"; it is deprecated.(âØûÿÿÿÿ8³ßÃ…ï1
+l
+java:S1874V"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(œƒƒ©ùÿÿÿÿ8¶ãÇ§ï1

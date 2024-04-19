@@ -156,64 +156,53 @@
     <ScrollView
         android:id="@+id/scrollView4"
         android:layout_width="match_parent"
-        android:layout_height="163dp"
+        android:layout_height="0sp"
         android:background="@color/tintedBlue"
+        android:layout_marginBottom="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editGroup_groupMember_header">
-
+        app:layout_constraintTop_toBottomOf="@+id/editGroup_groupMember_header"
+        app:layout_constraintBottom_toTopOf="@+id/editGroup_footerLayout">
         <LinearLayout
             android:id="@+id/editGroup_scrollView_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
         </LinearLayout>
-
     </ScrollView>
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/editGroup_footer"
-        android:layout_width="match_parent"
-        android:layout_height="91sp"
-        android:background="?attr/colorPrimary"
-        android:backgroundTint="@color/blue"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/editGroup_deleteGroup_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:background="@drawable/buttton"
-        android:backgroundTint="@color/darkRed"
-        android:text="Gruppe löschen"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:translationZ="200sp"
-        app:layout_constraintBottom_toBottomOf="@+id/editGroup_footer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/editGroup_footer"
-        app:layout_constraintTop_toTopOf="@+id/editGroup_footer" />
-
-    <Button
-        android:id="@+id/editGroup_cancel_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/buttton"
-        android:text="Zurück"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/editGroup_footer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-
+        <LinearLayout
+            android:id="@+id/editGroup_footerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+            <Button
+                android:id="@+id/editGroup_cancel_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10sp"
+                android:layout_marginEnd="10sp"
+                android:layout_marginBottom="10sp"
+                android:layout_weight="1"
+                android:background="@drawable/buttton"
+                android:text="Zurück"
+                android:textColor="@color/white"
+                android:textSize="16sp"/>
+            <Button
+                android:id="@+id/editGroup_deleteGroup_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10sp"
+                android:layout_marginEnd="10sp"
+                android:layout_marginBottom="10sp"
+                android:layout_weight="1"
+                android:background="@drawable/buttton"
+                android:backgroundTint="@color/darkRed"
+                android:text="Gruppe löschen"
+                android:textColor="@color/white"
+                android:textSize="16sp"/>
+        </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

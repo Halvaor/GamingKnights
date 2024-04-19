@@ -50,7 +50,10 @@ public class NewGroupActivity extends Activity {
         groupMemberEMails.add(Objects.requireNonNull(auth.getCurrentUser()).getEmail());
         fillUserView(binding);
 
-        //setListeners
+        bindListeners(binding);
+    }
+
+    private void bindListeners(ActivityNewGroupBinding binding) {
         binding.newGroupCancelButton.setOnClickListener(view -> {
             Intent dashboardActitvityIntent = new Intent(this, DashboardActivity.class);
             startActivity(dashboardActitvityIntent);
