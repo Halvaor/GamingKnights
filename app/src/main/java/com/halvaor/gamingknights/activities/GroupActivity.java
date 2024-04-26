@@ -156,8 +156,6 @@ public class GroupActivity extends Activity {
                             dateValue.setBackgroundColor(getResources().getColor(R.color.tintedBlue));
                         }
 
-
-
                         container.addView(item);
                     }
                 }

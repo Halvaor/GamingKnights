@@ -86,4 +86,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/login_iconRef"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Icons by www.icons8.com"
+        android:textColor="@color/grey"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:autoLink="web"
+        android:linksClickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
