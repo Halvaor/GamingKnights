@@ -653,10 +653,8 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                     .addOnSuccessListener(unused -> {
                         Log.d(TAG, "Successfully updated GameSuggestions: " + gameProposal);
 
-                        getGameSuggestionAndVotes();
-                        this.gameSuggestions.add(gameProposal);
+                        retrieveGameSuggestionsAndCreateItems();
 
-                        createGameSuggestionItems();
                     })
                     .addOnFailureListener(e -> {
                         Log.d(TAG, "Failed to updated GameSuggestions: " + gameProposal, e);
@@ -666,7 +664,24 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
         binding.gameNightGameProposalValue.setText("");
     }
 
-    private void getGameSuggestionAndVotes() {
+    private void retrieveGameSuggestionsAndCreateItems() {
+        DocumentReference gameNightRef = database.collection("GameNight").document(this.gameNightID);
+        gameNightRef.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                Log.d(TAG, "Successfully retrieved GameNightDate for: " + this.gameNightID);
+                if (task.getResult().exists()) {
+                    getGameSuggestionAndVotes(task.getResult());
+                    createGameSuggestionItems();
+                } else {
+                    Log.e(TAG, "Could´t find GameNight for: " + this.gameNightID);
+                }
+            }else {
+                Log.e(TAG, "Failed to retrieved GameNightData for: " + this.gameNightID);
+            }
+        });
+    }
+
+    private void getGameSuggestionAndVotes(DocumentSnapshot gameNightData) {
         this.gameSuggestions =(List<String>)gameNightData.get("GameSuggestions");
         this.gameSuggestionVotes = (Map<String, String>) gameNightData.get("GameSuggestionVotes");
     }
@@ -785,7 +800,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                         getRatings(task.getResult());
                         getDateAndTime(task.getResult());
                         getHost(task.getResult());
-                        getGameSuggestionAndVotes();
+                        getGameSuggestionAndVotes(task.getResult());
                         createGameSuggestionItems();
                         getFoodTypesAndLoadVotes();
                         getDeliveryServiceData();
@@ -829,7 +844,7 @@ public class GameNightActivity extends FragmentActivity implements TimePickerInt
                     Log.d(TAG, "Sucessfully retrieved gameNight document: " + gameNightID);
                     if (task.getResult().exists()) {
                         this.gameNightData = task.getResult();
-                        getGameSuggestionAndVotes();
+                        getGameSuggestionAndVotes(task.getResult());
                         createGameSuggestionItems();
                     } else {
                         Log.d(TAG, "Could´t find gameNight document with documentID: " + gameNightID);
